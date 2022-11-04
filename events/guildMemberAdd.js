@@ -20,6 +20,10 @@ client.on('guildMemberAdd', (member) => {
     welcomeChannel.send({ embeds: [welcomeEmbed] })
 
     //Add default role
-    var role = member.guild.roles.cache.find(role => role.name === "role name")
+    const baseRoleId = '1038049878984642641'
+
+    const baseRole = member.guild.roles.cache.find(role => role.id === baseRoleId)
+
+    member.roles.add(baseRole)
 
 })
