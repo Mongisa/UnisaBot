@@ -2,7 +2,9 @@ const client = require('../index')
 const userSchema = require('../schemas/user-schema')
 
 client.on('messageCreate', async msg => {
+    
     if(msg.author.bot) return
+
     const guildId = msg.guildId
     const guildName = msg.guild.name
     const userId = msg.author.id
