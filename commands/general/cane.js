@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Attachment } = require('discord.js')
+const { SlashCommandBuilder } = require('discord.js')
 const https = require('https')
 
 module.exports = {

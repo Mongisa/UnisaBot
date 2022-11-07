@@ -1,17 +1,26 @@
-const {Collection, GatewayIntentBits, Client, ActivityType} = require('discord.js')
+const {Collection, GatewayIntentBits, Client} = require('discord.js')
 const { REST } = require('@discordjs/rest')
 const { Routes } = require('discord-api-types/v9')
+const mongo = require('./mongo')
 const fs = require('fs')
 
 require('dotenv').config()
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] })
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages] })
 
 client.on('ready', async () => {
     module.exports = client
 
     await registerCommands()
     await loadEvents()
+    
+    await mongo().then(mongoose => {
+        try {
+            console.log('Connected to mongo! ✅')
+        } catch (e) {
+            console.log('error')
+        }
+    })
 
     console.log('UnisaBot is online!')
 })
@@ -60,6 +69,7 @@ async function registerCommands () {
     } catch (e) {
         console.error(e)
     }
+
 }
 
 async function loadEvents(dir = '') {

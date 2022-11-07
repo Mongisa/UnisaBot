@@ -9,11 +9,8 @@
   "author": "Mongisa",
   "license": "ISC",
   "dependencies": {
-    "@google-cloud/local-auth": "^2.1.0",
-    "chalk": "^5.1.2",
     "discord.js": "^14.6.0",
-    "distube": "^4.0.4",
     "dotenv": "^16.0.3",
-    "googleapis": "^105.0.0"
+    "mongoose": "^6.7.2"
   }
 }
