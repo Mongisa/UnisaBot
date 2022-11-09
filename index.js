@@ -6,14 +6,11 @@ const fs = require('fs')
 
 require('dotenv').config()
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages] })
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] })
 
 client.on('ready', async () => {
     module.exports = client
 
-    await registerCommands()
-    await loadEvents()
-    
     await mongo().then(mongoose => {
         try {
             console.log('Connected to mongo! ✅')
@@ -21,6 +18,10 @@ client.on('ready', async () => {
             console.log('error')
         }
     })
+
+    await registerCommands()
+    await loadEvents()
+    await onReadyActions()
 
     console.log('UnisaBot is online!')
 })
@@ -37,6 +38,8 @@ async function registerCommands () {
     
         const baseFolder = 'commands'
         const result = fs.readdirSync(`./${baseFolder}${dir}`)
+
+        if(!result.length) return
     
         result.forEach((obj) => {
 
@@ -75,6 +78,8 @@ async function registerCommands () {
 async function loadEvents(dir = '') {
     const baseFolder = 'events'
         const result = fs.readdirSync(`./${baseFolder}${dir}`)
+
+        if(!result.length) return
     
         result.forEach((obj) => {
 
@@ -82,10 +87,31 @@ async function loadEvents(dir = '') {
             
                 require(`./${baseFolder}${dir}/${obj}`)
 
-                console.log(`✅ [ ${obj} ] event loaded `)
+                console.log(`✅ [ ${obj} ] event loaded`)
 
             } else {
                 loadEvents(`/${obj}`)
+            }
+
+        })
+}
+
+async function onReadyActions(dir = '') {
+    const baseFolder = 'onReadyActions'
+        const result = fs.readdirSync(`./${baseFolder}${dir}`)
+
+        if(!result.length) return
+    
+        result.forEach((obj) => {
+
+            if(obj.endsWith('.js')) {
+            
+                require(`./${baseFolder}${dir}/${obj}`)()
+
+                console.log(`⚡ [ ${obj} ] action executed`)
+
+            } else {
+                onReadyActions(`/${obj}`)
             }
 
         })
