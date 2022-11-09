@@ -41,7 +41,7 @@ module.exports = async () => {
                     guildId: guild.guildId,
                     privateVoiceChannels: {
                         privateChannelsGeneratorId: result[index].privateVoiceChannels.privateChannelsGeneratorId,
-                        textAlertsChatId: result.privateVoiceChannels?.textAlertsChatId,
+                        textAlertsChatId: result[index].privateVoiceChannels.textAlertsChatId,
                         privateChannels: newArray
                     }
                 },{
@@ -65,7 +65,7 @@ module.exports = async () => {
                     guildId: guild.guildId,
                     privateVoiceChannels: {
                         privateChannelsGeneratorId: result[index].privateVoiceChannels.privateChannelsGeneratorId,
-                        textAlertsChatId: result.privateVoiceChannels.textAlertsChatId,
+                        textAlertsChatId: result[index].privateVoiceChannels.textAlertsChatId,
                         privateChannels: newArray
                     }
                 },{

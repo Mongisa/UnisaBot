@@ -1,5 +1,5 @@
 const client = require('../index')
-const { ChannelType, EmbedBuilder } = require('discord.js')
+const { ChannelType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 const guildsSettingsSchema = require('../schemas/guildsSettings-schema')
 
 client.on('voiceStateUpdate', async (oldState, newState) => {
@@ -44,7 +44,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 
     const privateChannels = result.privateVoiceChannels.privateChannels
 
-    privateChannels.push({ 'id': channel.id, 'owner': userId })
+    privateChannels.push({ 'id': channel.id, 'owner': userId, 'locked': false })
 
     await updateDatabase(guildId, result, channelsArray)
 
@@ -65,7 +65,9 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
         .setThumbnail(newState.member.user.avatarURL())
         .setTimestamp()
 
-    await textChannel.send({ embeds: [dashboardEmbed] })
+    const buttons = await buildButtons() 
+
+    await textChannel.send({ embeds: [dashboardEmbed], components: [new ActionRowBuilder().setComponents(buttons.buttonLock, buttons.buttonUnlock)] })
 })
 
 //Funzioni
@@ -84,4 +86,23 @@ async function updateDatabase(guildId, result, channelsArray) {
         new: true,
         upsert: true
     })
+}
+
+async function buildButtons() {
+    const buttonLock = new ButtonBuilder()
+        .setCustomId('lock_channel')
+        .setEmoji('🔒')
+        .setStyle(ButtonStyle.Primary)
+
+    const buttonUnlock = new ButtonBuilder()
+        .setCustomId('unlock_channel')
+        .setEmoji('🔓')
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled()
+    
+    const buttons = {
+        buttonLock, buttonUnlock
+    }
+
+    return buttons
 }

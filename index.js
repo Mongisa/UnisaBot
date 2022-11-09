@@ -11,6 +11,8 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 client.on('ready', async () => {
     module.exports = client
 
+    client.buttons = new Collection()
+
     await mongo().then(mongoose => {
         try {
             console.log('Connected to mongo! ✅')
@@ -21,6 +23,7 @@ client.on('ready', async () => {
 
     await registerCommands()
     await loadEvents()
+    await loadButtons()
     await onReadyActions()
 
     console.log('UnisaBot is online!')
@@ -91,6 +94,29 @@ async function loadEvents(dir = '') {
 
             } else {
                 loadEvents(`/${obj}`)
+            }
+
+        })
+}
+
+async function loadButtons(dir='') {
+    const baseFolder = 'buttons'
+        const result = fs.readdirSync(`./${baseFolder}${dir}`)
+
+        if(!result.length) return
+    
+        result.forEach((obj) => {
+
+            if(obj.endsWith('.js')) {
+            
+                const button = require(`./${baseFolder}${dir}/${obj}`)
+
+                client.buttons.set(button.data.name, button)
+
+                console.log(`🔲 [ ${obj} ] button loaded`)
+
+            } else {
+                loadButtons(`/${obj}`)
             }
 
         })
