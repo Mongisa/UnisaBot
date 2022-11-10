@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js')
+const client = require('../../index')
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -10,5 +11,7 @@ module.exports = {
          */
         async execute(interaction) {
             interaction.reply(`Pong! \`\`${interaction.client.ws.ping} ms\`\``)
+
+            client.emit('guildMemberAdd', interaction.member)
         }
 }
