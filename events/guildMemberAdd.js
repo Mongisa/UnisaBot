@@ -28,7 +28,7 @@ client.on('guildMemberAdd', async member => {
             .setAvatarBorder("#000000")
             .build()
 
-        welcomeChannel.send({ files: [{ attachment: welcomeCanvas.toBuffer(), name: `welcome-${member.id}.png` }] })
+        welcomeChannel.send({ content:`<@${member.id}>`, files: [{ attachment: welcomeCanvas.toBuffer(), name: `welcome-${member.id}.png` }] })
     }
 
     if(result.baseRoleId) {
