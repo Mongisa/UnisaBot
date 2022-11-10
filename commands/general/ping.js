@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require('discord.js')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('ping')
-        .setDescription('Un comando di merda per vedere se il bot funziona'),
+        .setDescription('Ping del bot'),
 
         /**
          * @param {import('discord.js').Interaction} interaction 
