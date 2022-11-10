@@ -17,6 +17,7 @@ module.exports = {
     */
     async execute(interaction) {
         const guildId = interaction.guildId
+        const guildName = interaction.guild.name
 
         const data = interaction.options.data.filter(e => {
             return e.name == 'textchannelid'
@@ -32,6 +33,7 @@ module.exports = {
             guildId
         },{
             guildId,
+            guildName,
             welcomeChannelId
         },{
             upsert: true,
