@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js')
+const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require('discord.js')
 const guildSettingsSchema = require('../../schemas/guildsSettings-schema')
 
 module.exports = {
@@ -6,20 +6,17 @@ module.exports = {
         .setName('impostacanaleprivato')
         .setDescription('Permette di impostare un generatore di chat vocali private')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-        .addStringOption(option =>
+        .addChannelOption(option =>
             option
                 .setName('voicechannelid')
                 .setDescription(`L'id del canale vocale generatore`)
-                .setRequired(true)
-                .setMinLength(19)
-                .setMaxLength(19)   
+                .addChannelTypes(ChannelType.GuildVoice) 
         )
-        .addStringOption(option =>
+        .addChannelOption(option =>
             option
                 .setName('textchannelid')
                 .setDescription(`L'id del canale testuale dove ricevere notifiche`)
-                .setMinLength(19)
-                .setMaxLength(19)    
+                .addChannelTypes(ChannelType.GuildText)   
         )
         /*.addNumberOption(option =>
             option
@@ -35,9 +32,9 @@ module.exports = {
         const guildId = interaction.guildId
         const guildName = interaction.guild.name
         
-        const voicechannelId = data.filter(e => {
+        var voicechannelId = data.filter(e => {
             return e.name == 'voicechannelid'
-        })[0].value
+        })
 
         var textchannelId = data.filter(e => {
             return e.name == 'textchannelid'
@@ -46,6 +43,13 @@ module.exports = {
         if(textchannelId.length) {
             textchannelId = textchannelId[0].value
         } else {
+            textchannelId = null
+        }
+
+        if(voicechannelId.length) {
+            var voicechannelId = voicechannelId[0].value
+        } else {
+            voicechannelId = null
             textchannelId = null
         }
 
@@ -64,6 +68,12 @@ module.exports = {
             upsert: true
         })
 
-        interaction.reply('Factos')
+        if(voicechannelId != null && textchannelId != null) {
+            interaction.reply({ content:`<#${voicechannelId}> è stato impostato come generatore di chat vocali private \n<#${textchannelId}> è stata impostata per l'invio della dashboard`, ephemeral: true })
+        } else if(voicechannelId != null && textchannelId == null) {
+            interaction.reply({ content:`<#${voicechannelId}> è stato impostato come generatore di chat vocali private`, ephemeral: true})
+        } else if(voicechannelId == null &&  textchannelId == null) {
+            interaction.reply({ content:`\`\`La funzione di generatore di chat private è stata disabilitata\`\``, ephemeral: true })
+        }
     }
 }

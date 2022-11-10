@@ -18,6 +18,8 @@ const unreqArray = {
 const guildsSettingsSchema = mongoose.Schema({
     guildId: reqString,
     guildName: unreqString,
+    welcomeChannelId: unreqString,
+    defaultRoleId: unreqString,
     privateVoiceChannels: {
         //Id canale vocale generatore
         privateChannelsGeneratorId: unreqString,
