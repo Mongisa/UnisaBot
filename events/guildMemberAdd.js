@@ -31,13 +31,13 @@ client.on('guildMemberAdd', async member => {
         welcomeChannel.send({ content:`<@${member.id}>`, files: [{ attachment: welcomeCanvas.toBuffer(), name: `welcome-${member.id}.png` }] })
     }
 
-    if(result.baseRoleId) {
+    if(result.defaultRoleId) {
         //Add default role
-        const baseRoleId = result.baseRoleId
+        const defaultRoleId = result.defaultRoleId
 
-        const baseRole = member.guild.roles.cache.find(role => role.id === baseRoleId)
+        const defaultRole = member.guild.roles.cache.find(role => role.id === defaultRoleId)
 
-        member.roles.add(baseRole)
+        member.roles.add(defaultRole)
     }
 
 })
