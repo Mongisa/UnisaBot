@@ -14,11 +14,6 @@ module.exports = {
         try {
             const channel = await client.birthday.getGuildBirthdayChannel(interaction.guild)
 
-            if(!channel) {
-                interaction.reply(`Non è stato impostato nessun canale per gli auguri`)
-                return
-            }
-
             interaction.reply(`Il canale per gli auguri è <#${channel.id}>`)
         } catch(e) {
             console.log(e)
