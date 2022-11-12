@@ -1,8 +1,10 @@
 //Questo script pulisce i canali vocali privati vuoti sincronizzando il database
-const client = require('../index')
 const guildsSettingsSchema = require('../schemas/guildsSettings-schema')
 
-module.exports = async () => {
+/**
+ * @param {import('discord.js').Client} client 
+ */
+module.exports = async (client) => {
     var result = await guildsSettingsSchema.find()
 
     const guildsArray = result.filter(e => {

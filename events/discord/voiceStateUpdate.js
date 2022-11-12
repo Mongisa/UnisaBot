@@ -1,6 +1,6 @@
-const client = require('../index')
+const client = require('../../index')
 const { ChannelType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
-const guildsSettingsSchema = require('../schemas/guildsSettings-schema')
+const guildsSettingsSchema = require('../../schemas/guildsSettings-schema')
 
 client.on('voiceStateUpdate', async (oldState, newState) => {
     if(newState.member.user.bot) return
@@ -12,7 +12,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
         guildId
     })
     
-    if(!result) return
+    if(!result || !result.privateVoiceChannels.hasOwnProperty('privateChannelsGeneratorId') || !result.privateVoiceChannels.privateChannelsGeneratorId) return
 
     var channelsArray = result.privateVoiceChannels.privateChannels
 
@@ -32,7 +32,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 
     if(newState.channelId != result.privateVoiceChannels.privateChannelsGeneratorId) return
 
-    const parentId = newState.channel.parentId
+    const parentId = newState.channel?.parentId
 
     const channel = await newState.guild.channels.create({ name: `🔓 ${newState.member.nickname|| newState.member.user.username}'s Private Room`, type: ChannelType.GuildVoice })
     

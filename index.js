@@ -22,11 +22,11 @@ client.on('ready', async () => {
     })
 
     await registerCommands()
+    await onReadyActions()
     await loadEvents()
     await loadButtons()
-    await onReadyActions()
 
-    console.log('UnisaBot is online!')
+    console.log(`UnisaBot is online! [ ${client.guilds.cache.size} servers ]`)
 })
 
 client.login(process.env.BOT_TOKEN)
@@ -90,7 +90,7 @@ async function loadEvents(dir = '') {
             
                 require(`./${baseFolder}${dir}/${obj}`)
 
-                console.log(`✅ [ ${obj} ] event loaded`)
+                console.log(`📅 [ ${dir.slice(1)||'base'} | ${obj} ] event loaded`)
 
             } else {
                 loadEvents(`/${obj}`)
@@ -132,7 +132,7 @@ async function onReadyActions(dir = '') {
 
             if(obj.endsWith('.js')) {
             
-                require(`./${baseFolder}${dir}/${obj}`)()
+                require(`./${baseFolder}${dir}/${obj}`)(client)
 
                 console.log(`⚡ [ ${obj} ] action executed`)
 

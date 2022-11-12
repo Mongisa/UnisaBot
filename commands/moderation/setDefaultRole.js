@@ -6,6 +6,7 @@ module.exports = {
         .setName('defaultrole')
         .setDescription('Ruolo che viene assegnato automaticamente quando un utente si unisce al server')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+        .setDMPermission(false)
         .addRoleOption(option => 
             option
                 .setName('defaultroleid')

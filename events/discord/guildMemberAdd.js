@@ -1,6 +1,6 @@
-const client = require('../index')
+const client = require('../../index')
 const canvafy = require('canvafy')
-const guildsSettingsSchema = require('../schemas/guildsSettings-schema')
+const guildsSettingsSchema = require('../../schemas/guildsSettings-schema')
 
 client.on('guildMemberAdd', async member => {
     
