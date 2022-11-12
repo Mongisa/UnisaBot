@@ -14,7 +14,7 @@ module.exports = {
         try {
             await client.birthday.deleteGuildBirthdayChannel(interaction.guild)
 
-            interaction.reply(`Il canale per gli auguri è stato eliminato`)
+            interaction.reply({ content : `Il canale per gli auguri è stato eliminato`, ephemeral: true })
         } catch(e) {
             console.log(e)
         }

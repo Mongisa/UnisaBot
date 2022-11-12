@@ -32,7 +32,6 @@ module.exports = {
 
         try {
             const birthday = await client.birthday.getUserBirthday(user)
-
             if(!birthday) {
                 interaction.reply(`Il compleanno di **${user.nickname||user.username}** non è stato impostato. Usa /setuserbirthday`)
                 return
