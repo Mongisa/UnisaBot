@@ -1,5 +1,5 @@
-const client = require('../index')
-const userSchema = require('../schemas/user-schema')
+const client = require('../../index')
+const userSchema = require('../../schemas/user-schema')
 
 client.on('messageCreate', async msg => {
     

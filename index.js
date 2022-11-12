@@ -22,9 +22,9 @@ client.on('ready', async () => {
     })
 
     await registerCommands()
+    await onReadyActions()
     await loadEvents()
     await loadButtons()
-    await onReadyActions()
 
     console.log('UnisaBot is online!')
 })
