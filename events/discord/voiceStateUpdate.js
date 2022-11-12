@@ -30,9 +30,9 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
         return
     }
 
-    if(newState.channelId != result.privateVoiceChannels.privateChannelsGeneratorId) return
+    if(newState.channelId != result.privateVoiceChannels.privateChannelsGeneratorId || !newState.channelId) return
 
-    const parentId = newState.channel?.parentId
+    const parentId = newState.channel.parentId
 
     const channel = await newState.guild.channels.create({ name: `🔓 ${newState.member.nickname|| newState.member.user.username}'s Private Room`, type: ChannelType.GuildVoice })
     
