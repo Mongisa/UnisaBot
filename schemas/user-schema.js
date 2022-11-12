@@ -15,8 +15,7 @@ const userSchema = mongoose.Schema({
     guildName: reqString,
     userId: reqString,
     username: reqString,
-    totalMessagesSent: unreqNumber,
-    totalInteractions: unreqNumber
+    totalMessagesSent: unreqNumber
 })
 
 module.exports = mongoose.model('users', userSchema)

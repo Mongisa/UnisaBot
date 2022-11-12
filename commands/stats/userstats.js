@@ -4,8 +4,7 @@ const userStats = require('../../schemas/user-schema')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('mystats')
-        .setDescription('Mostra le tue statistiche nel server')
-        .setDMPermission(false),
+        .setDescription('Mostra le tue statistiche nel server'),
     /**
     * @param {import('discord.js').Interaction} interaction 
     */
@@ -29,8 +28,7 @@ module.exports = {
             .setThumbnail(interaction.user.avatarURL())
 
             .setFields(
-                { name: 'Messaggi Totali Inviati', value: result.totalMessagesSent?.toString() || 0 },
-                { name: 'Interazioni Totali', value: result.totalInteractions?.toString() || 0 },
+                { name: 'Messaggi Totali Inviati', value: result.totalMessagesSent.toString() },
                 { name: 'Data Creazione Account', value: interaction.user.createdAt.toDateString() },
                 { name: 'Data Unione Server', value: interaction.member.joinedAt.toString() },
             )

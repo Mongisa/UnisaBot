@@ -1,5 +1,4 @@
-const client = require('../../index')
-const userSchema = require('../../schemas/user-schema')
+const client = require('../index')
 
 client.on('interactionCreate', async (interaction) => {
 
@@ -7,8 +6,6 @@ client.on('interactionCreate', async (interaction) => {
         const command = client.commands.get(interaction.commandName)
 
         if(!command) return
-
-        await updateDatabase(interaction)        
 
         try {
             await command.execute(interaction)
@@ -20,11 +17,12 @@ client.on('interactionCreate', async (interaction) => {
                 ephemeral: true
             })
         }
+        return
     } else if(interaction.isButton()) {
         const { buttons } = client
         const { customId } = interaction
         const button = buttons.get(customId)
-        
+
         if(!button) return new Error('There is no code for this button!')
 
         try {
@@ -34,31 +32,5 @@ client.on('interactionCreate', async (interaction) => {
 
             console.log(e)
         }
-    } else if(interaction.isAutocomplete()) {
-        try {
-            await command.autocomplete(interaction)
-        } catch(e) {
-            console.error(e)
-        }
     }
 })
-
-//Functions
-
-async function updateDatabase(interaction) {
-    await userSchema.findOneAndUpdate({
-        guildId: interaction.guild.id,
-        userId: interaction.user.id
-    },{
-        guildId: interaction.guild.id,
-        userId: interaction.user.id,
-        username: interaction.user.username,
-        guilName: interaction.guild.name,
-        $inc: {
-            totalInteractions: 1
-        }
-    },{
-        upsert: true,
-        new: true
-    })
-}

@@ -6,7 +6,6 @@ module.exports = {
         .setName('welcomechannel')
         .setDescription('Imposta il canale dove ricevere le notifiche di benvenuto.')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-        .setDMPermission(false)
         .addChannelOption(option =>
             option
             .setName('textchannelid')
