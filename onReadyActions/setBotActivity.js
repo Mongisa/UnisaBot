@@ -6,8 +6,8 @@ module.exports = async () => {
     const time = 5 * 60 * 1000
     
     const setActivity = () => {
-        
-        const index = randomIndex(botActivities)
+
+        const index = randomNumber(0, botActivities.length - 1)
         const activity = botActivities[index]
 
         switch(activity.type) {
@@ -35,6 +35,6 @@ module.exports = async () => {
     }, time)
 }
 
-function randomIndex (botActivities) {
-    return Math.floor(Math.random() * (botActivities.length - 1))
-}
+function randomNumber(min, max) { 
+    return Math.round(Math.random() * (max - min) + min);
+} 

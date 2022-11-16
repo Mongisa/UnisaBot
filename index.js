@@ -49,8 +49,14 @@ async function registerCommands () {
             if(obj.endsWith('.js')) {
             
                 const command = require(`./${baseFolder}${dir}/${obj}`)
-                commands.push(command.data.toJSON())
-                client.commands.set(command.data.name, command)
+
+                if(command.data) {
+                    commands.push(command.data.toJSON())
+                    client.commands.set(command.data.name, command)
+                } else if(command.type == 2) {
+                    commands.push({ type: command.type, name: command.name })
+                    client.commands.set(command.name, command)
+                }
 
                 console.log(`✅ [ ${obj} ] command loaded `)
 
