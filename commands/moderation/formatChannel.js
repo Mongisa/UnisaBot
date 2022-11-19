@@ -101,5 +101,14 @@ async function subCommandText(interaction) {
 * @param {import('discord.js').Interaction} interaction 
 */
 async function subCommandVoice(interaction) {
+    const channelId = interaction.options.get('channel').channel.id
+    const emoji = interaction.options.get('emoji').value
 
+    const channel = interaction.guild.channels.cache.get(channelId)
+
+    const newName = `[${emoji}] ${channel.name}`
+
+    await channel.edit({ name: newName })
+
+    await interaction.reply({ content: `${inlineCode(`✅| Il nome della chat è stato modificato in`)} <#${channelId}>`, ephemeral: true })
 }
