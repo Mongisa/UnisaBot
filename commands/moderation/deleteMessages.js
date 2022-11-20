@@ -5,6 +5,7 @@ module.exports = {
         .setName('delete')
         .setDescription('Cancella i messaggi nella chat dove viene utilizzato il comando')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
+        .setDMPermission(false)
 
         .addNumberOption(option =>
             option

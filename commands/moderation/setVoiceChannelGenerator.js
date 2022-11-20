@@ -6,6 +6,7 @@ module.exports = {
         .setName('impostacanaleprivato')
         .setDescription('Permette di impostare un generatore di chat vocali private')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+        .setDMPermission(false)
         .addChannelOption(option =>
             option
                 .setName('voicechannelid')
