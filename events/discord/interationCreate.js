@@ -32,5 +32,11 @@ client.on('interactionCreate', async (interaction) => {
 
             console.log(e)
         }
+    }else if(interaction.isAutocomplete()) {
+        const command = client.commands.get(interaction.commandName)
+
+        if(command.autocomplete) {
+            command.autocomplete(interaction)
+        }
     }
 })

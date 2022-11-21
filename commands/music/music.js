@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, inlineCode } = require('discord.js');
+const spotify = require('../../APIs/spotifyAPI.js')
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,6 +15,7 @@ module.exports = {
                     option
                         .setName('song')
                         .setDescription('La canzone da riprodurre')
+                        .setAutocomplete(true)
                         .setRequired(true)
                 )
         )
@@ -182,9 +184,23 @@ module.exports = {
                 await removealltracks(interaction, distube);
                 break;
         }
+    },
+    async autocomplete(interaction) {
+        const subcommand = interaction.options.getSubcommand()
+        
+        if(subcommand == 'play') {
+            const focusedValue = interaction.options.getFocused();
+
+            if(focusedValue.length < 4) return
+
+            const data = await spotify.searchTracks(focusedValue, 5)
+
+            interaction.respond(data.map(track => ({ name: `${track.name} - 👤 ${track.artists[0].name}`, value: track.name })))
+        }
     }
 }
 
+//Funzioni
 /**
  * @param {import('discord.js').Interaction} interaction
  * @param {import('distube').default} distube
