@@ -1,5 +1,6 @@
 [
-    { "type": "PLAYING", "activity": "scacchi"},
+    { "type": "PLAYING", "activity": "Scacchi"},
     { "type": "PLAYING", "activity": "con i numeri complessi" },
-    { "type": "PLAYING", "activity": "con i linguaggio c" }
+    { "type": "PLAYING", "activity": "con i linguaggio c" },
+    { "type": "PLAYING", "activity": "Prato Fiorito" }
 ]

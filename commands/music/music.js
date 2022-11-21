@@ -299,3 +299,18 @@ async function pause(interaction, distube) {
     await interaction.reply({ content: `${inlineCode("✔️| Pausa!")}`, ephemeral: true })
     
 }
+
+async function resume(interaction, distube) {
+        
+    const queue = distube.getQueue(interaction)
+        
+    if(!queue) {
+        interaction.reply({ content: `${inlineCode("⚠️| Non sto riproducendo musica!")}`, ephemeral: true })
+        return
+    }
+        
+    distube.resume(interaction);
+        
+    await interaction.reply({ content: `${inlineCode("✔️| Ripresa!")}`, ephemeral: true })
+        
+}
