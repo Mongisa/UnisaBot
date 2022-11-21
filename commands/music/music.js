@@ -1,14 +1,15 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, inlineCode } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('music')
         .setDescription('Comandi per la musica')
         .setDMPermission(false)
+        
         .addSubcommand(subcommand =>
             subcommand
                 .setName('play')
-                .setDescription('Riproduce una canzone')
+                .setDescription('▶️ Riproduce una canzone')
                 .addStringOption(option =>
                     option
                         .setName('song')
@@ -16,46 +17,45 @@ module.exports = {
                         .setRequired(true)
                 )
         )
-
         .addSubcommand(subcommand =>
             subcommand
                 .setName('stop')
-                .setDescription('Ferma la musica')
+                .setDescription('⏹️ Ferma la musica')
         )
         .addSubcommand(subcommand =>
             subcommand
                 .setName('skip')
-                .setDescription('Salta la canzone')
+                .setDescription('⏭️ Salta la canzone')
         )
         .addSubcommand(subcommand =>
             subcommand
                 .setName('queue')
-                .setDescription('Mostra la coda')
+                .setDescription('ℹ️ Mostra la coda')
         )
         .addSubcommand(subcommand =>
             subcommand
                 .setName('pause')
-                .setDescription('Mette in pausa la musica')
+                .setDescription('⏸️ Pausa la musica')
         )
         .addSubcommand(subcommand =>
             subcommand
                 .setName('resume')
-                .setDescription('Riprende la musica')
+                .setDescription('▶️ Riprende la musica')
         )
         .addSubcommand(subcommand =>
             subcommand
                 .setName('loop')
-                .setDescription('Ripete la canzone')
+                .setDescription('🔁 Ripete la canzone')
         )
         .addSubcommand(subcommand =>
             subcommand
                 .setName('shuffle')
-                .setDescription('Mischia la coda')
+                .setDescription('🔀 Mescola la coda')
         )
         .addSubcommand(subcommand =>
             subcommand
                 .setName('remove')
-                .setDescription('Rimuove una canzone dalla coda')
+                .setDescription('🗑️ Rimuove una canzone dalla coda')
                 .addIntegerOption(option =>
                     option
                         .setName('song')
@@ -66,7 +66,7 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName('volume')
-                .setDescription('Imposta il volume')
+                .setDescription('🔊 Cambia il volume')
                 .addIntegerOption(option =>
                     option
                         .setName('volume')
@@ -77,7 +77,7 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName('seek')
-                .setDescription('Salta alla posizione della canzone')
+                .setDescription('⏩ Salta una parte della canzone')
                 .addIntegerOption(option =>
                     option
                         .setName('time')
@@ -88,12 +88,12 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName('nowplaying')
-                .setDescription('Mostra la canzone in riproduzione')
+                .setDescription('🎶 Mostra la canzone in riproduzione')
         )
         .addSubcommand(subcommand =>
             subcommand
                 .setName('jump')
-                .setDescription('Salta alla canzone')
+                .setDescription('⏩ Salta alla canzone')
                 .addIntegerOption(option =>
                     option
                         .setName('song')
@@ -104,7 +104,7 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName('clearqueue')
-                .setDescription('Cancella la coda')
+                .setDescription('🗑️ Cancella la coda')
         )
         .addSubcommand(subcommand =>
             subcommand
@@ -114,17 +114,7 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName('lyrics')
-                .setDescription('Mostra il testo della canzone')
-        )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('removeallfilters')
-                .setDescription('Rimuove tutti i filtri')
-        )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('removeallqueue')
-                .setDescription('Rimuove tutte le canzoni dalla coda')
+                .setDescription('📝 Mostra il testo della canzone')
         )
         .addSubcommand(subcommand =>
             subcommand
@@ -133,6 +123,11 @@ module.exports = {
         ),
     async execute(interaction) {
         const distube = require('../../onReadyActions/distube');
+
+        const channel = interaction.member.voice.channel;
+
+        if (!channel) return interaction.reply({ content: `${inlineCode("⚠️| Devi essere in un canale vocale per usare questo comando!")}`, ephemeral: true });
+
         const subcommand = interaction.options.getSubcommand();
         switch (subcommand) {
             case 'play':
@@ -168,12 +163,6 @@ module.exports = {
             case 'seek':
                 await seek(interaction, distube);
                 break;
-            case 'filter':
-                await filter(interaction, distube);
-                break;
-            case 'filters':
-                await filters(interaction, distube);
-                break;
             case 'nowplaying':
                 await nowplaying(interaction, distube);
                 break;
@@ -186,17 +175,8 @@ module.exports = {
             case 'autoplay':
                 await autoplay(interaction, distube);
                 break;
-            case 'removefilter':
-                await removefilter(interaction, distube);
-                break;
             case 'lyrics':
                 await lyrics(interaction, distube);
-                break;
-            case 'removeallfilters':
-                await removeallfilters(interaction, distube);
-                break;
-            case 'removeallqueue':
-                await removeallqueue(interaction, distube);
                 break;
             case 'removealltracks':
                 await removealltracks(interaction, distube);
@@ -205,10 +185,12 @@ module.exports = {
     }
 }
 
+/**
+ * @param {import('discord.js').Interaction} interaction
+ * @param {import('distube').default} distube
+ */
 async function play(interaction, distube) {
     const channel = interaction.member.voice.channel;
-
-    if (!channel) return interaction.reply({ content: `${inlineCode("⚠️| Devi essere in un canale vocale per usare questo comando!")}`, ephemeral: true });
 
     const song = interaction.options.getString('song');
 
@@ -218,10 +200,11 @@ async function play(interaction, distube) {
     await interaction.deleteReply()
 }
 
+/**
+ * @param {import('discord.js').Interaction} interaction
+ * @param {import('distube').default} distube
+ */
 async function stop(interaction, distube) {
-    const channel = interaction.member.voice.channel;
-
-    if (!channel) return interaction.reply({ content: `${inlineCode("⚠️| Devi essere in un canale vocale per usare questo comando!")}`, ephemeral: true });
 
     const queue = distube.getQueue(interaction)
 
@@ -234,4 +217,69 @@ async function stop(interaction, distube) {
 
     await interaction.reply('✔️')
     await interaction.deleteReply()
+}
+
+/**
+* @param {import('discord.js').Interaction} interaction
+* @param {import('distube').default} distube
+*/
+async function skip(interaction, distube) {
+
+    const queue = distube.getQueue(interaction)
+
+    if(!queue) {
+        interaction.reply({ content: `${inlineCode("⚠️| Non sto riproducendo musica!")}`, ephemeral: true })
+        return
+    }
+
+    distube.skip(interaction);
+
+    await interaction.reply({ content: `${inlineCode("✔️| Saltata la canzone!")}`, ephemeral: true })
+}
+
+/**
+* @param {import('discord.js').Interaction} interaction
+* @param {import('distube').default} distube
+*/
+async function queue(interaction, distube) {
+    
+    const queue = distube.getQueue(interaction)
+    
+    if(!queue) {
+        interaction.reply({ content: `${inlineCode("⚠️| Non sto riproducendo musica!")}`, ephemeral: true })
+        return
+    }
+    
+    const queueEmbed = new EmbedBuilder()
+        .setColor('#90EE90')
+        .setTitle('ℹ️ Coda ℹ️')
+        .setDescription(`Coda di ${queue.songs.length} canzoni`)
+        .setThumbnail(queue.songs[0].thumbnail)
+        .setTimestamp()
+    
+    queue.songs.forEach((song, index) => {
+        queueEmbed.addFields({ name:`Traccia ${index + 1}`, value: `${song.name} - ${song.formattedDuration}`})
+    })
+    
+    await interaction.reply({ embeds: [queueEmbed] })
+
+}
+
+/**
+* @param {import('discord.js').Interaction} interaction
+* @param {import('distube').default} distube
+*/
+async function pause(interaction, distube) {
+    
+    const queue = distube.getQueue(interaction)
+    
+    if(!queue) {
+        interaction.reply({ content: `${inlineCode("⚠️| Non sto riproducendo musica!")}`, ephemeral: true })
+        return
+    }
+    
+    distube.pause(interaction);
+    
+    await interaction.reply({ content: `${inlineCode("✔️| Pausa!")}`, ephemeral: true })
+    
 }

@@ -9,7 +9,8 @@ distube.on('playSong', (queue, song) => {
         .setFields(
             { name: '🖹 Titolo', value: song.name },
             { name: '📏 Durata', value: song.formattedDuration, inline: true },
-            { name: '👤 Richiesta Da', value: song.member.user.username, inline: true }
+            { name: '👤 Richiesta Da', value: song.member.user.username, inline: true },
+            { name: '🔗 Link', value: song.url }
         )
         .setTimestamp()
 
