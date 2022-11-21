@@ -1,9 +1,9 @@
 const distube = require('../../onReadyActions/distube')
 const { EmbedBuilder } = require('discord.js')
 
-distube.on('playSong', (queue, song) => {
-    const playSongEmbed = new EmbedBuilder()
-        .setTitle('🎵 Riproduzione 🎵')
+distube.on('addSong', (queue, song) => {
+    const addSongEmbed = new EmbedBuilder()
+        .setTitle('🎵 Aggiunta alla coda 🎵')
         .setColor('#90EE90')
         .setThumbnail(song.thumbnail)
         .setFields(
@@ -13,5 +13,5 @@ distube.on('playSong', (queue, song) => {
         )
         .setTimestamp()
 
-    queue.textChannel.send({ embeds: [playSongEmbed] })
+    queue.textChannel.send({ embeds: [addSongEmbed] })
 })

@@ -7,6 +7,8 @@ require('ffmpeg-static')
 module.exports = async () => {
     const distube = new Distube.default(client, {
         leaveOnFinish: true,
+        emitNewSongOnly: true,
+        emitAddSongWhenCreatingQueue: false,
         plugins: [new SpotifyPlugin({
             emitEventsAfterFetching: true
         })]
