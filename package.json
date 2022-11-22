@@ -24,6 +24,7 @@
     "free-music-archive": "^1.0.0",
     "libsodium-wrappers": "^0.7.10",
     "mongoose": "^6.7.2",
+    "music-lyrics": "^2.0.2",
     "numeral": "^2.0.6",
     "opusscript": "^0.0.8",
     "request": "^2.88.2",

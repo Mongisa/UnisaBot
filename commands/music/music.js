@@ -314,3 +314,37 @@ async function resume(interaction, distube) {
     await interaction.reply({ content: `${inlineCode("✔️| Ripresa!")}`, ephemeral: true })
         
 }
+
+/**
+ * 
+ * @param {import('discord.js').Interaction} interaction 
+ * @param {import('distube').DisTube} distube 
+ */
+async function lyrics(interaction, distube) {
+    const lyricsAPI = require('../../APIs/lyricsAPI')
+    interaction.deferReply()
+    const queue = distube.getQueue(interaction)
+
+    if(!queue) {
+        interaction.reply({ content: `${inlineCode("⚠️| Non sto riproducendo musica!")}`, ephemeral: true })
+        return
+    }
+
+    const song = queue.songs[0]
+
+    try {
+        const lyrics = await lyricsAPI(song.name)
+
+        const lyricsEmbed = new EmbedBuilder()
+        .setColor('#90EE90')
+        .setTitle(`📃 Testo di ${song.name} 📃`)
+        .setDescription(lyrics)
+        .setThumbnail(song.thumbnail)
+        .setTimestamp()
+
+        await interaction.editReply({ embeds: [lyricsEmbed] })
+    } catch (error) {
+        console.log(error)
+        interaction.editReply(inlineCode("⚠️| Non ho trovato testi per questa canzone"))
+    }
+}

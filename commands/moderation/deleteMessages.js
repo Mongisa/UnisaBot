@@ -23,8 +23,12 @@ module.exports = {
         const chatId = interaction.channel.id
         const number = interaction.options.data[0].value
 
-        interaction.guild.channels.cache.get(chatId).bulkDelete(number)
+        try {
+            await interaction.guild.channels.cache.get(chatId).bulkDelete(number)
+        } catch (error) {
+            console.log(error)
+        }
 
-        interaction.reply({ content: `Messaggi Eliminati \`\`${number}\`\``, ephemeral: true })
+        await interaction.reply({ content: `Messaggi Eliminati \`\`${number}\`\``, ephemeral: true })
     }
 }

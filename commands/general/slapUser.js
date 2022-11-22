@@ -23,8 +23,11 @@ module.exports = {
 
         var data
 
-        if(!result || !result.data || !result.data[guildId]) {
+        if(!result || !result.data) {
             data = {}
+            data[guildId] = 1
+        } else if(!result.data[guildId]) {
+            data = result.data
             data[guildId] = 1
         } else {
             data = result.data

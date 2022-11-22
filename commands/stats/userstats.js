@@ -28,21 +28,37 @@ module.exports = {
             userId
         })
 
+        const joinedAt = new Date(interaction.member.joinedTimestamp).toLocaleDateString('it-IT', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+        })
+
+        const createdAt = new Date(interaction.user.createdAt).toLocaleDateString('it-IT', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+        })
+
         const userStatsEmbed = new EmbedBuilder()
             .setTitle(`📊 Statistiche ${username} | ${interaction.guild.name} 📊`)
             .setThumbnail(interaction.user.avatarURL())
             .setColor('Gold')
 
             .setFields(
-                { name: 'Data Creazione Account', value: interaction.user.createdAt.toDateString() },
-                { name: 'Data Unione Server', value: interaction.member.joinedAt.toString() },
-                { name: 'Messaggi Totali Inviati', value: result.totalMessagesSent.toString() }
+                { name: '🗓️ Data Creazione Account', value: createdAt },
+                { name: '🗓️ Data Unione Server', value: joinedAt },
+                { name: '🔢 Messaggi Totali Inviati', value: result.totalMessagesSent.toString() }
             )
 
             .setTimestamp()
 
         if(slapsData.data[guildId]) {
-            userStatsEmbed.addFields({ name: 'Schiaffi Ricevuti', value: slapsData.data[guildId].toString() })
+            userStatsEmbed.addFields({ name: '✋ Schiaffi Ricevuti', value: slapsData.data[guildId].toString() })
         }
 
         interaction.reply({ embeds: [userStatsEmbed] })
