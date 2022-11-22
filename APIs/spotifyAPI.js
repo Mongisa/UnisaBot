@@ -66,7 +66,7 @@ async function retrieveToken() {
     name: 'spotify token'
   })
 
-  if(!data || data.expires_date < new Date()) {
+  if(!data || new Date(data.expires_date) < new Date()) {
     await generateNewToken();
     return await retrieveToken();
   }
