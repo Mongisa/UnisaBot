@@ -18,8 +18,11 @@ const unreqArray = {
 const guildsSettingsSchema = mongoose.Schema({
     guildId: reqString,
     guildName: unreqString,
+    //Canale dove vengono inviati i messaggi di benvenuto
     welcomeChannelId: unreqString,
+    //Ruolo che viene dato quando un utente entra nel server
     defaultRoleId: unreqString,
+    //Generatore di chat privata
     privateVoiceChannels: {
         //Id canale vocale generatore
         privateChannelsGeneratorId: unreqString,
@@ -27,6 +30,11 @@ const guildsSettingsSchema = mongoose.Schema({
         textAlertsChatId: unreqString,
         //Array delle attuali chat vocali generate nel server
         privateChannels: unreqArray
+    },
+    //Chanale vocale con contatore dei membri del server
+    memberCountChannel: {
+        channelId: unreqString,
+        name: unreqString
     }
 })
 

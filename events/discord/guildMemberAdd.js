@@ -12,6 +12,7 @@ client.on('guildMemberAdd', async member => {
 
     if(!result) return
 
+    //Benvenuto
     if(result.welcomeChannelId) {
         const welcomeChannelId = result.welcomeChannelId
 
@@ -31,8 +32,9 @@ client.on('guildMemberAdd', async member => {
         welcomeChannel.send({ content:`<@${member.id}>`, files: [{ attachment: welcomeCanvas.toBuffer(), name: `welcome-${member.id}.png` }] })
     }
 
+    //Assegna il ruolo di default
     if(result.defaultRoleId) {
-        //Add default role
+
         const defaultRoleId = result.defaultRoleId
 
         const defaultRole = member.guild.roles.cache.find(role => role.id === defaultRoleId)

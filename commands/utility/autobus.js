@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ActionRowBuilder } = require('discord.js')
+const autobusAPI = require('../../APIs/autobusAPI')
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -21,7 +22,6 @@ module.exports = {
     */
     async execute(interaction) {
         const subcommand = interaction.options.getSubcommand()
-        const linea = interaction.options.getString('linea')
 
         switch(subcommand) {
             case 'busitalia':
@@ -37,7 +37,11 @@ module.exports = {
         const focusedValue = interaction.options.getFocused()
 
         if(subcommand === 'busitalia') {
-            
+            const lines = await autobusAPI.busitalia.getLines()
+
+            const filtered = lines.filter(line => line.name.toLowerCase().includes(focusedValue.toLowerCase()))
+
+            await interaction.respond(filtered.map(choice => ({name: `${choice.name} - ${choice.from}`, value: choice.name.toLowerCase() })))
         }
 
     }
@@ -48,7 +52,27 @@ module.exports = {
  * @param {import('discord.js').Interaction} interaction
  */
 async function busitalia(interaction) {
-    const linea = interaction.options.getString('linea')
+    const selectedLineString = interaction.options.getString('linea')
 
-    console.log(linea)
+    const lines = await autobusAPI.busitalia.getLines()
+
+    const selectedLine = lines.find(line => line.name.toLowerCase() == selectedLineString)
+
+    if(!selectedLine) return interaction.reply({content: 'Linea non trovata', ephemeral: true})
+
+    const lineEmbed = new EmbedBuilder()
+        .setTitle(selectedLine.name)
+        .setDescription(`Partenza da ${selectedLine.from}`)
+        .setFields(
+            {name: 'Tipo', value: selectedLine.type}
+        )
+        .setColor('#50C878')
+        .setFooter({text: 'Powered by Busitalia', iconURL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Busitalia_logo.svg/512px-Busitalia_logo.svg.png'})
+
+    const linkButton = new ButtonBuilder()
+        .setLabel(`🔗 ${selectedLine.name}`)
+        .setStyle('Link') 
+        .setURL(selectedLine.link)
+
+    await interaction.reply({embeds: [lineEmbed], components: [new ActionRowBuilder().addComponents(linkButton)]})
 }
