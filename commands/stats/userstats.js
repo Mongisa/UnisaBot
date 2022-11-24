@@ -52,10 +52,12 @@ module.exports = {
             .setFields(
                 { name: '🗓️ Data Creazione Account', value: createdAt },
                 { name: '🗓️ Data Unione Server', value: joinedAt },
-                { name: '🔢 Messaggi Totali Inviati', value: result.totalMessagesSent.toString() }
+                { name: '🔢 Messaggi Totali Inviati', value: result.totalMessagesSent.toString() },
+                { name: `Interazioni con ${interaction.client.user.username}`, value: result.totalInteractions?.toString() || '0' },
             )
 
             .setTimestamp()
+            .setFooter({ text: 'Powered by Discord.js', iconURL: 'https://www.clipartmax.com/png/middle/89-894960_js-discord-bot-logo-node-js-and-react-js.png' })
 
         if(slapsData.data[guildId]) {
             userStatsEmbed.addFields({ name: '✋ Schiaffi Ricevuti', value: slapsData.data[guildId].toString() })

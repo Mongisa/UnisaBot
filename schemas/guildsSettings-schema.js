@@ -15,6 +15,11 @@ const unreqArray = {
     required: false
 }
 
+const unreqNumber = {
+    type: Number,
+    required: false
+}
+
 const guildsSettingsSchema = mongoose.Schema({
     guildId: reqString,
     guildName: unreqString,
@@ -31,11 +36,12 @@ const guildsSettingsSchema = mongoose.Schema({
         //Array delle attuali chat vocali generate nel server
         privateChannels: unreqArray
     },
-    //Chanale vocale con contatore dei membri del server
+    //Canale vocale con contatore dei membri del server
     memberCountChannel: {
         channelId: unreqString,
         name: unreqString
-    }
+    },
+    totalInteractions: unreqNumber
 })
 
 module.exports = mongoose.model('guildsSettings', guildsSettingsSchema)

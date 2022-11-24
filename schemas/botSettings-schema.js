@@ -5,11 +5,26 @@ const reqString = {
     required: true
 }
 
+const unreqString = {
+    type: String,
+    required: false
+}
+
+const unreqNumber = {
+    type: Number,
+    required: false
+}
+
 const botSettingsSchema = mongoose.Schema({
     name: reqString,
-    token: reqString,
-    expires_in: reqString,
-    expires_date: reqString
+
+    //Spotify
+    token: unreqString,
+    expires_in: unreqString,
+    expires_date: unreqString,
+
+    //Bot Stats
+    uptime: unreqNumber
 })
 
 module.exports = mongoose.model('botSettings', botSettingsSchema)
