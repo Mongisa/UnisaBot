@@ -32,7 +32,7 @@ module.exports = {
             .setFooter({ text: 'Powered by Discord.js', iconURL: 'https://www.clipartmax.com/png/middle/89-894960_js-discord-bot-logo-node-js-and-react-js.png' })
 
             .setFields(
-                { name: 'Tempo Totale Online', value: `${Math.round(uptime/60)}h${Math.round(uptime%60)}` },
+                { name: 'Tempo Totale Online', value: `${Math.round(uptime/(60*24))}g${Math.round(uptime%1440/60)}h${Math.round(uptime % 1440 %60)}m` },
                 { name: 'Interazioni Totali', value: totalInteractions.toString() }
             )
 

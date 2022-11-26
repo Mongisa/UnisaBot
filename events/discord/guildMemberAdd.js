@@ -22,12 +22,18 @@ client.on('guildMemberAdd', async member => {
     
         const welcomeCanvas = await new canvafy.WelcomeLeave()
             .setAvatar(member.user.displayAvatarURL({ forceStatic: true, extension: 'png' }))
-            .setBackground('color', '#2FF3E0')
             .setTitle(`Benvenuto/a ${member.user.username}`, '#000000')
             .setDescription(`Benvenuto in ${member.guild.name}!`, '#FA26A0')
             .setBorder("#000000")
             .setAvatarBorder("#000000")
-            .build()
+
+            if(member.displayHexColor && member.displayHexColor !== '#000000') {
+                welcomeCanvas.setColor('color', member.displayHexColor)
+            } else {
+                welcomeCanvas.setBackground('color', '#2FF3E0')
+            }
+
+            welcomeCanvas.build()
 
         welcomeChannel.send({ content:`<@${member.id}>`, files: [{ attachment: welcomeCanvas.toBuffer(), name: `welcome-${member.id}.png` }] })
     }
