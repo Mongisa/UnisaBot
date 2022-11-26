@@ -5,7 +5,7 @@ const guildsSettingsSchema = require('../../schemas/guildsSettings-schema')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('botstats')
-        .setDescription('Mostra le statistiche del bot'),
+        .setDescription('📊 Mostra le statistiche del bot'),
     /**
      *  @param {import('discord.js').Interaction} interaction 
      */

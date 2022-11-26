@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require('discord.js')
+const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, inlineCode } = require('discord.js')
 const guildsSettingsSchema = require('../../schemas/guildsSettings-schema')
 
 module.exports = {
@@ -42,9 +42,9 @@ module.exports = {
         })
 
         if(welcomeChannelId) {
-            interaction.reply({ content: `<#${interaction.guild.channels.cache.get(welcomeChannelId).id}> è stato impostato per i messaggi di benvenuto`, ephemeral: true })
+            interaction.reply({ content: `${inlineCode('✅|')} <#${interaction.guild.channels.cache.get(welcomeChannelId).id}> ${inlineCode('è stato impostato per i messaggi di benvenuto')}`, ephemeral: true })
         } else {
-            interaction.reply({ content: `\`\`La funzione di messaggi di benvenuto è stata disabilitata\`\``, ephemeral: true })
+            interaction.reply({ content: inlineCode(`La funzione di messaggi di benvenuto è stata disabilitata`), ephemeral: true })
         }
         
     }

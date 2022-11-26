@@ -1,10 +1,10 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js')
+const { SlashCommandBuilder, PermissionFlagsBits, inlineCode } = require('discord.js')
 const guildsSettingsSchema = require('../../schemas/guildsSettings-schema')
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('defaultrole')
-        .setDescription('Ruolo che viene assegnato automaticamente quando un utente si unisce al server')
+        .setDescription('👤 Ruolo che viene assegnato automaticamente quando un utente si unisce al server')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false)
         .addRoleOption(option => 
@@ -39,9 +39,9 @@ module.exports = {
         })
 
         if(defaultRoleId) {
-            interaction.reply({ content: `<@&${interaction.guild.roles.cache.get(defaultRoleId).id}> verrà assegnato a tutti i nuovi membri`, ephemeral: true })
+            interaction.reply({ content: `${inlineCode('✅|')} <@&${interaction.guild.roles.cache.get(defaultRoleId).id}> ${inlineCode('verrà assegnato a tutti i nuovi membri')}`, ephemeral: true })
         } else {
-            interaction.reply({ content: `\`\`La funzione di aggiunta ruolo è stata disabilitata\`\``, ephemeral: true })
+            interaction.reply({ content: inlineCode(`❌| La funzione di aggiunta ruolo è stata disabilitata`), ephemeral: true })
         }
     }
 }

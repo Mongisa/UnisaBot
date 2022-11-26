@@ -1,6 +1,7 @@
 const client = require('../../index')
 const guildsSettingsSchema = require('../../schemas/guildsSettings-schema')
 const userSchema = require('../../schemas/user-schema')
+const { inlineCode } = require('discord.js')
 
 client.on('interactionCreate', async (interaction) => {
 
@@ -18,7 +19,7 @@ client.on('interactionCreate', async (interaction) => {
             console.error(e)
 
             await interaction.reply({
-                content: 'Si è verificato un errore durante l\'esecuzione del comando',
+                content: inlineCode('⚠️|Si è verificato un errore durante l\'esecuzione del comando'),
                 ephemeral: true
             })
         }
@@ -33,7 +34,7 @@ client.on('interactionCreate', async (interaction) => {
         try {
             await button.execute(interaction)
         } catch(e) {
-            await interaction.reply({ content: `C'è stato un problema durante l'esecuzione del bottone`, ephemeral: true })
+            await interaction.reply({ content: inlineCode(`⚠️| C'è stato un problema durante l'esecuzione del bottone`), ephemeral: true })
 
             console.log(e)
         }
@@ -65,7 +66,7 @@ async function refreshDatabaseStats(guildId, userId) {
                 upsert: true
             })
 
-            const data = await userSchema.findOneAndUpdate({
+            await userSchema.findOneAndUpdate({
                 userId,
                 guildId
             }, {

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require('discord.js')
+const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, inlineCode } = require('discord.js')
 const guildSettingsSchema = require('../../schemas/guildsSettings-schema')
 
 module.exports = {
@@ -74,7 +74,7 @@ module.exports = {
         } else if(voicechannelId != null && textchannelId == null) {
             interaction.reply({ content:`<#${voicechannelId}> è stato impostato come generatore di chat vocali private`, ephemeral: true})
         } else if(voicechannelId == null &&  textchannelId == null) {
-            interaction.reply({ content:`\`\`La funzione di generatore di chat private è stata disabilitata\`\``, ephemeral: true })
+            interaction.reply({ content: inlineCode(`❌| La funzione di generatore di chat private è stata disabilitata`), ephemeral: true })
         }
     }
 }

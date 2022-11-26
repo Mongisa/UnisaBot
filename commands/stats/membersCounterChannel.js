@@ -4,7 +4,7 @@ const guildsSettingsSchema = require('../../schemas/guildsSettings-schema')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('canalecontatoremembri')
-        .setDescription('Imposta il canale vocale con il contatore dei membri del server')
+        .setDescription('🔢 Imposta il canale vocale con il contatore dei membri del server')
         .setDMPermission(false)
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addChannelOption(option =>

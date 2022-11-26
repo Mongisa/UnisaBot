@@ -4,7 +4,7 @@ const guildsSettingsSchema = require('../../schemas/guildsSettings-schema')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('serverstats')
-        .setDescription('Mostra le statistiche del server'),
+        .setDescription('📊 Mostra le statistiche del server'),
     /**
      * @param {import('discord.js').CommandInteraction} interaction
      */
@@ -31,7 +31,7 @@ module.exports = {
                 { name: `Interazioni con ${interaction.client.user.username}`, value: guildSettings.totalInteractions.toString(), inline: true },
                 { name: 'Canale Contatore Membri', value: guildSettings.memberCountChannel.channelId ? `<#${guildSettings.memberCountChannel.channelId}>` : 'Non impostato', inline: true },
                 { name: 'Chat Messaggi di Benvenuto', value: guildSettings.welcomeChannelId ? `<#${guildSettings.welcomeChannelId}>` : 'Non impostato', inline: true },
-                { name: 'Ruolo Assegnato di Default', value: guildSettings.defaultRoleId ? `<@&${guildSettings.defaultRoleId}>` : 'Non impostato', inline: true },
+                { name: '👤 Ruolo Assegnato di Default', value: guildSettings.defaultRoleId ? `<@&${guildSettings.defaultRoleId}>` : 'Non impostato', inline: true },
             )
             .setTimestamp()
             .setThumbnail(interaction.guild.iconURL({ dynamic: true }))

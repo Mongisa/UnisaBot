@@ -4,7 +4,7 @@ const nasaAPI = require('../../APIs/nasaAPI');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('nasa')
-        .setDescription('Interfacciati con l\'API della NASA')
+        .setDescription('🌠 Interfacciati con l\'API della NASA')
 
         //Foto del giorno
         .addSubcommand(subcommand =>

@@ -1,11 +1,11 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder, inlineCode } = require('discord.js')
 const userStats = require('../../schemas/user-schema')
 const slapsSchema = require('../../schemas/slaps-schema')
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('mystats')
-        .setDescription('Mostra le tue statistiche nel server'),
+        .setDescription('📊 Mostra le tue statistiche nel server'),
     /**
     * @param {import('discord.js').Interaction} interaction 
     */
@@ -20,7 +20,7 @@ module.exports = {
         })
 
         if(!result) {
-            interaction.reply({ content: 'Ancora non posseggo tue informazioni!', ephimeral: true })
+            interaction.reply({ content: inlineCode('⚠️| Ancora non posseggo tue informazioni!'), ephimeral: true })
             return
         }
 

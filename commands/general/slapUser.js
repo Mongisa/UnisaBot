@@ -1,4 +1,4 @@
-const { bold } = require('discord.js')
+const { bold, inlineCode } = require('discord.js')
 const slapsSchema = require('../../schemas/slaps-schema')
 
 module.exports = {
@@ -13,7 +13,7 @@ module.exports = {
         const guildId = interaction.guild.id
 
         if(interaction.guild.members.cache.get(targetUserId).user.bot) {
-            interaction.reply({ content: `Non puoi schiaffeggiare un bot!`, ephemeral: true })
+            interaction.reply({ content: inlineCode(`⚠️| Non puoi schiaffeggiare un bot!`), ephemeral: true })
             return
         }
 
@@ -53,6 +53,6 @@ module.exports = {
             dm.send(`Sei stato schiaffeggiato da ${bold(interaction.user.username)}`)
         }
 
-        interaction.reply({ content: `${bold(targetUsername)} è stato schiaffeggiato`, ephemeral: true })
+        interaction.reply({ content: inlineCode(`✅| ${bold(targetUsername)} è stato schiaffeggiato`), ephemeral: true })
     }
 }

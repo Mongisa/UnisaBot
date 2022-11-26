@@ -3,14 +3,14 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('delete')
-        .setDescription('Cancella i messaggi nella chat dove viene utilizzato il comando')
+        .setDescription('❌ Cancella i messaggi nella chat dove viene utilizzato il comando')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
         .setDMPermission(false)
 
         .addNumberOption(option =>
             option
                 .setName('numero')
-                .setDescription('Numero di messaggi da eliminare')
+                .setDescription('🔢 Numero di messaggi da eliminare')
                 .setMinValue(1)
                 .setMaxValue(100)
                 .setRequired(true)
@@ -29,6 +29,6 @@ module.exports = {
             console.log(error)
         }
 
-        await interaction.reply({ content: `Messaggi Eliminati \`\`${number}\`\``, ephemeral: true })
+        await interaction.reply({ content: inlineCode(`✅|Messaggi Eliminati [${number}]`), ephemeral: true })
     }
 }

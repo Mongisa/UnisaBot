@@ -1,14 +1,14 @@
-const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ActionRowBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ActionRowBuilder, inlineCode } = require('discord.js')
 const autobusAPI = require('../../APIs/autobusAPI')
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('autobus')
-        .setDescription('Informazioni sugli autobus universitari')
+        .setDescription('🚌 Informazioni sugli autobus universitari')
         .addSubcommand(subcommand =>
             subcommand
                 .setName('busitalia')
-                .setDescription('Informazioni sugli autobus di Busitalia')
+                .setDescription('🚌 Informazioni sugli autobus di Busitalia')
                 .addStringOption(option =>
                     option
                         .setName('linea')
@@ -58,7 +58,7 @@ async function busitalia(interaction) {
 
     const selectedLine = lines.find(line => line.name.toLowerCase() == selectedLineString)
 
-    if(!selectedLine) return interaction.reply({content: 'Linea non trovata', ephemeral: true})
+    if(!selectedLine) return interaction.reply({content: inlineCode('⚠️| Linea non trovata'), ephemeral: true})
 
     const lineEmbed = new EmbedBuilder()
         .setTitle(selectedLine.name)

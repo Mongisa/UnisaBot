@@ -3,7 +3,7 @@ const { SlashCommandBuilder, ChannelType, PermissionFlagsBits, inlineCode } = re
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('formatchannel')
-        .setDescription('Formatta sia i canali vocali che testuali')
+        .setDescription('🖌️ Formatta sia i canali vocali che testuali')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false)
 
@@ -11,7 +11,7 @@ module.exports = {
         .addSubcommand(subcommand => 
             subcommand
                 .setName('text')
-                .setDescription('Modifica il nome una chat testuale')
+                .setDescription('🔤 Modifica il nome una chat testuale')
                 .addChannelOption(channel => 
                     channel
                         .setName('channel')
@@ -31,7 +31,7 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName('voice')
-                .setDescription('Modifica il nome una chat vocale')
+                .setDescription('🎤 Modifica il nome una chat vocale')
                 .addChannelOption(channel => 
                     channel
                         .setName('channel')
@@ -63,10 +63,10 @@ module.exports = {
 
         const channelName = interaction.options.get('channel').channel.name
         const channelId = interaction.options.get('channel').channel.id
+        
         //Controlla se il nome del canale contiene già un'emoji
-
         if(regexExp.test(channelName)) {
-            await interaction.reply({ content: `<#${channelId}> contiene già un'emoji, eliminala e riutilizza il comando`, ephemeral: true })
+            await interaction.reply({ content: `${inlineCode('⚠️|')} <#${channelId}> ${inlineCode(`contiene già un'emoji, eliminala e riutilizza il comando`)}`, ephemeral: true })
             return
         }
 
