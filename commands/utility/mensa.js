@@ -47,6 +47,8 @@ async function pranzo(interaction, link) {
         .setTitle('Menù del pranzo')
         .setDescription(`[Clicca qui](${link}) per visualizzare il menù`)
         .setColor('#FFA500')
+        .setThumbnail('https://adisurcportalegare.aflink.it/portale/templates/aflinktemplate3//images/i_logo.png')
+        .setFooter({ text: 'Powered by mensaunisa.it' })
         .setTimestamp()
 
     await interaction.reply({ embeds: [embed] })
@@ -61,6 +63,8 @@ async function cena(interaction, link) {
         .setTitle('Menù della cena')
         .setDescription(`[Clicca qui](${link}) per visualizzare il menù`)
         .setColor('#FFA500')
+        .setThumbnail('https://adisurcportalegare.aflink.it/portale/templates/aflinktemplate3//images/i_logo.png')
+        .setFooter({ text: 'Powered by mensaunisa.it' })
         .setTimestamp()
 
     await interaction.reply({ embeds: [embed] })
