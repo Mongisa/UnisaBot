@@ -10,6 +10,11 @@ const unreqNumber = {
     required: false
 }
 
+const unreqArray = {
+    type: Array,
+    required: false
+}
+
 const userSchema = mongoose.Schema({
     guildId: reqString,
     guildName: reqString,
@@ -17,6 +22,7 @@ const userSchema = mongoose.Schema({
     username: reqString,
     totalMessagesSent: unreqNumber,
     totalInteractions: unreqNumber,
+    spidCredentialsCookies: unreqArray,
 })
 
 module.exports = mongoose.model('users', userSchema)
