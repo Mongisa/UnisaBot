@@ -6,35 +6,37 @@ const process = require('process')
  * @param {String} userId - The user's ID
  * @param {String} guildId - The guild's ID
  */
-module.exports.spidLogin = async (userId, guildId) => {
+module.exports.checkSpidLogin = async (userId, guildId) => {
+    return new Promise((resolve, reject) => {
+        const browser = await puppeteer.launch({headless: true})
 
-    const browser = await puppeteer.launch({headless: true})
+        const page = await browser.newPage()
+        await page.setViewport({width: 1920, height: 1080})
 
-    const page = await browser.newPage()
-    await page.setViewport({width: 1920, height: 1080})
-
-    await page.goto('https://www.biblioteche.unisa.it/chiedi-al-bibliotecario?richiesta=3');
+        await page.goto('https://www.biblioteche.unisa.it/chiedi-al-bibliotecario?richiesta=3');
     
-    require('dotenv').config()
-    const mongo = require('../mongo')
+        require('dotenv').config()
+        const mongo = require('../mongo')
 
-    await mongo()
+        await mongo()
 
-    const cookies = await getDatabaseCookies()
+        const cookies = await getDatabaseCookies()
 
-    if(!cookies) {
-        console.log('No cookies found')
-        const imgPath = await generateNewSpidQr(browser, page)
+        if(!cookies) {
+            console.log('No cookies found')
+            const imgPath = await generateNewSpidQr(browser, page)
 
-        console.log(imgPath)
+            reject(imgPath)
 
-        await delay(20000)
+            await page.waitForNavigation({ timeout: 120000 });
+        
+            //Manda il messaggio qr su discord
 
-        //await page.waitForNavigation({ timeout: 60000 });
-        page.screenShot({path: 'spid.png'})
-        console.log('Logged in')
+            setDatabaseCookies()
 
-    }
+        }
+    })
+    
 }
 
 module.exports.getAvailableDays = async () => {
