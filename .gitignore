@@ -2,3 +2,5 @@
 .env
 GoogleCredentials.json
 token.json
+spidQr.png
+test.jsx

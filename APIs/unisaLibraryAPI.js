@@ -1,40 +1,55 @@
 const puppeteer = require('puppeteer')
 const userSchema = require('../schemas/user-schema')
 const process = require('process')
+const CryptoJS = require('crypto-js')
+const { AttachmentBuilder, inlineCode } = require('discord.js')
 
 /**
  * @param {String} userId - The user's ID
  * @param {String} guildId - The guild's ID
+ * @param {import('discord.js').Interaction} interaction - The interaction object
  */
-module.exports.spidLogin = async (userId, guildId) => {
+module.exports.checkSpidLogin = async (userId, guildId, interaction) => {
+    return new Promise(async (resolve, reject) => {
+        const browser = await puppeteer.launch({headless: true})
 
-    const browser = await puppeteer.launch({headless: true})
+        const page = await browser.newPage()
+        await page.setViewport({width: 1920, height: 1080})
 
-    const page = await browser.newPage()
-    await page.setViewport({width: 1920, height: 1080})
+        await page.goto('https://www.biblioteche.unisa.it/chiedi-al-bibliotecario?richiesta=3');
 
-    await page.goto('https://www.biblioteche.unisa.it/chiedi-al-bibliotecario?richiesta=3');
+        const cookies = await getDatabaseCookies(userId, guildId)
+
+        if(!cookies) {
+            const qrCodePath = await generateNewSpidQr(browser, page)
+
+            const attachment = new AttachmentBuilder()
+            .setFile(qrCodePath)
+            .setName('qrCode.png')
+
+            await interaction.editReply({content: 'Per favore scansiona il qr per eseguire l\'accesso', files: [attachment], epehemeral: true })
+
+            try {
+                await page.waitForNavigation({ timeout: 120000 });
+
+                await interaction.editReply({content: inlineCode("Loading..."), epehemeral: true, files: [] })
+
+                await page.click('.btn-primary')
+                await page.waitForNavigation();
+                await delay(2000)
+                const cookies = await page.cookies()
+
+                await setDatabaseCookies(userId, guildId, cookies)
+                resolve()
+            } catch(e) {
+                reject(e)
+            }
+        } else {
+            console.log(cookies)
+            interaction.editReply({content: inlineCode("Factos"), epehemeral: true, files: [] })
+        }
+    })
     
-    require('dotenv').config()
-    const mongo = require('../mongo')
-
-    await mongo()
-
-    const cookies = await getDatabaseCookies()
-
-    if(!cookies) {
-        console.log('No cookies found')
-        const imgPath = await generateNewSpidQr(browser, page)
-
-        console.log(imgPath)
-
-        await delay(20000)
-
-        //await page.waitForNavigation({ timeout: 60000 });
-        page.screenShot({path: 'spid.png'})
-        console.log('Logged in')
-
-    }
 }
 
 module.exports.getAvailableDays = async () => {
@@ -55,23 +70,11 @@ async function getDatabaseCookies(userId, guildId) {
                 guildId: guildId
             })
     
-            if (!data) return resolve(null)
+            if (!data || !data.spidCredentialsCookies) return resolve(null)
     
-            const result = []
+            const decryptedCookies = await decryptCookies(data.spidCredentialsCookies)
     
-            data.spidCredentialsCookies.forEach(async (cookie, index) => {
-                result.push({})
-                for(const key in cookie) {
-                    if(typeof cookie[key] == 'string' && key != 'path' && key != 'sourceScheme') {
-                        const decrypted = await decrypt(cookie[key])
-                        result[index][key] = decrypted
-                    } else  {
-                        result[index][key] = cookie[key]
-                    }
-                }
-            })
-    
-            resolve(result)
+            resolve(decryptedCookies)
         } catch(e) {
             reject(e)
         }
@@ -80,7 +83,25 @@ async function getDatabaseCookies(userId, guildId) {
 
 async function setDatabaseCookies(userId, guildId, cookies) {
     return new Promise(async (resolve, reject) => {
-    
+        try {
+            const encryptedCookies = await encryptCookies(cookies)
+
+            await userSchema.findOneAndUpdate({
+                userId: userId,
+                guildId: guildId
+            },{
+                userId: userId,
+                guildId: guildId,
+                spidCredentialsCookies: encryptedCookies
+            }, {
+                upsert: true,
+                new: true
+            })
+
+            resolve()
+        } catch(e) {
+            reject(e)
+        }
     })
 }
 
@@ -128,6 +149,51 @@ async function decrypt(string) {
     return bytes.toString(CryptoJS.enc.Utf8);
 }
 
+async function encryptCookies(cookies) {
+    return new Promise((resolve, reject) => {
+        const encryptedCookies = []
+
+        cookies.forEach(async (cookie, index) => {
+            encryptedCookies.push({})
+            for(const key in cookie) {
+                if(typeof cookie[key] == 'string' && key != 'path' && key != 'sourceScheme') {
+                    const encrypted = await encrypt(cookie[key])
+                    encryptedCookies[index][key] = encrypted
+
+                    if(index == cookies.length - 1) resolve(encryptedCookies)
+
+                } else  {
+                    encryptedCookies[index][key] = cookie[key]
+
+                    if(index == cookies.length - 1) resolve(encryptedCookies)
+                }
+            }
+        })
+    })
+}
+
+async function decryptCookies(cookies) {
+    return new Promise((resolve, reject) => {
+        const decryptedCookies = []
+
+        cookies.forEach(async (cookie, index) => {
+            decryptedCookies.push({})
+            for(const key in cookie) {
+                if(typeof cookie[key] == 'string' && key != 'path' && key != 'sourceScheme') {
+                    const decrypted = await decrypt(cookie[key])
+                    decryptedCookies[index][key] = decrypted
+
+                    if(index == cookies.length - 1) resolve(decryptedCookies)
+
+                } else  {
+                    decryptedCookies[index][key] = cookie[key]
+
+                    if(index == cookies.length - 1) resolve(decryptedCookies)
+                }
+            }
+        })
+    })
+}
 //Delay function
 function delay(time) {
     return new Promise(function(resolve) { 

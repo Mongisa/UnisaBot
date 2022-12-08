@@ -250,7 +250,7 @@ async function skip(interaction, distube) {
 
     distube.skip(interaction);
 
-    await interaction.reply({ content: `${inlineCode("✔️| Saltata la canzone!")}`, ephemeral: true })
+    await interaction.reply({ content: ` `, ephemeral: true })
 }
 
 /**
