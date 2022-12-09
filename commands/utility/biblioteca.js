@@ -37,7 +37,10 @@ async function loginSpid(interaction) {
         await unisaLibraryAPI.checkSpidLogin(userId, guildId, interaction)
         await interaction.editReply({content: inlineCode("✔️| Accesso SPID eseguito con successo!"), epehemeral: true, files: [] })
     } catch(e) {
-        console.log(e)
+        if(e.message === 'EXPIRED') {
+            await interaction.editReply({content: inlineCode('⚠️| Il tuo QR Code è scaduto! Usa nuovamente il comando per eseguire l\accesso'), epehemeral: true, files: [] })
+        } else {
         await interaction.editReply({content: inlineCode('Si è verificato un errore generico!'), epehemeral: true, files: [] })
+        }
     }
 }

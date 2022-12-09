@@ -22,7 +22,6 @@ module.exports.checkSpidLogin = async (userId, guildId, interaction) => {
 
         if(!cookies) {
             const qrCodePath = await generateNewSpidQr(browser, page)
-
             const attachment = new AttachmentBuilder()
             .setFile(qrCodePath)
             .setName('qrCode.png')
@@ -40,20 +39,58 @@ module.exports.checkSpidLogin = async (userId, guildId, interaction) => {
                 const cookies = await page.cookies()
 
                 await setDatabaseCookies(userId, guildId, cookies)
-                resolve()
+
+                try {
+                    const result = await validateLogin(page, cookies)
+                    resolve(result)
+                } catch(e) {
+                    await userSchema.findOneAndUpdate({
+                        userId: userId,
+                        guildId: guildId
+                    },{
+                        userId: userId,
+                        guildId: guildId,
+                        spidCredentialsCookies: null
+                    }, {
+                        upsert: true,
+                        new: true
+                    })
+
+                    reject(e)
+                }
             } catch(e) {
                 reject(e)
             }
         } else {
-            console.log(cookies)
-            interaction.editReply({content: inlineCode("Factos"), epehemeral: true, files: [] })
+            try {
+                const result = await validateLogin(page, cookies)
+                resolve(result)
+
+                await browser.close()
+            } catch(e) {
+                await userSchema.findOneAndUpdate({
+                    userId: userId,
+                    guildId: guildId
+                },{
+                    userId: userId,
+                    guildId: guildId,
+                    spidCredentialsCookies: null
+                }, {
+                    upsert: true,
+                    new: true
+                })
+
+                reject(e)
+
+                await browser.close()
+            }
         }
     })
     
 }
 
 module.exports.getAvailableDays = async () => {
-
+    
 }
 
 //Functions
@@ -70,8 +107,11 @@ async function getDatabaseCookies(userId, guildId) {
                 guildId: guildId
             })
     
-            if (!data || !data.spidCredentialsCookies) return resolve(null)
-    
+            if (!data || !data.spidCredentialsCookies || data.spidCredentialsCookies.length === 0) {
+                resolve(null)
+                return
+            }
+
             const decryptedCookies = await decryptCookies(data.spidCredentialsCookies)
     
             resolve(decryptedCookies)
@@ -99,6 +139,28 @@ async function setDatabaseCookies(userId, guildId, cookies) {
             })
 
             resolve()
+        } catch(e) {
+            reject(e)
+        }
+    })
+}
+
+async function validateLogin(page, cookies) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            for (let cookie of cookies) {
+                await page.setCookie(cookie);
+            }
+    
+            await page.goto('https://www.biblioteche.unisa.it/chiedi-al-bibliotecario?richiesta=3');
+    
+            const titolo = await page.title()
+    
+            if(titolo == 'Spazio di Ateneo') {
+                resolve()
+            } else {
+                reject("EXPIRED")
+            }
         } catch(e) {
             reject(e)
         }
