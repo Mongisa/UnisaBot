@@ -44,6 +44,19 @@ client.on('interactionCreate', async (interaction) => {
         if(command.autocomplete) {
             command.autocomplete(interaction)
         }
+    } else if (interaction.isSelectMenu()) {
+        const commandName = interaction.message.interaction.commandName.split(' ')[0]
+        const command = client.commands.get(commandName)
+
+        if(!command) return
+
+        try {
+            await command.selectMenu(interaction)
+        } catch(e) {
+            await interaction.reply({ content: inlineCode(`⚠️| C'è stato un problema durante l'esecuzione del menu`), ephemeral: true })
+
+            console.log(e)
+        }
     }
 })
 

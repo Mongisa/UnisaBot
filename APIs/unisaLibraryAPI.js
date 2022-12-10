@@ -41,21 +41,9 @@ module.exports.checkSpidLogin = async (userId, guildId, interaction) => {
                 await setDatabaseCookies(userId, guildId, cookies)
 
                 try {
-                    const result = await validateLogin(page, cookies)
+                    const result = await validateLogin(page, cookies, userId, guildId)
                     resolve(result)
                 } catch(e) {
-                    await userSchema.findOneAndUpdate({
-                        userId: userId,
-                        guildId: guildId
-                    },{
-                        userId: userId,
-                        guildId: guildId,
-                        spidCredentialsCookies: null
-                    }, {
-                        upsert: true,
-                        new: true
-                    })
-
                     reject(e)
                 }
             } catch(e) {
@@ -63,23 +51,11 @@ module.exports.checkSpidLogin = async (userId, guildId, interaction) => {
             }
         } else {
             try {
-                const result = await validateLogin(page, cookies)
+                const result = await validateLogin(page, cookies, userId, guildId)
                 resolve(result)
 
                 await browser.close()
             } catch(e) {
-                await userSchema.findOneAndUpdate({
-                    userId: userId,
-                    guildId: guildId
-                },{
-                    userId: userId,
-                    guildId: guildId,
-                    spidCredentialsCookies: null
-                }, {
-                    upsert: true,
-                    new: true
-                })
-
                 reject(e)
 
                 await browser.close()
@@ -89,8 +65,170 @@ module.exports.checkSpidLogin = async (userId, guildId, interaction) => {
     
 }
 
-module.exports.getAvailableDays = async () => {
-    
+/**
+ * @param {String} userId - The user's ID
+ * @param {String} guildId  - The guild's ID
+ * @param {String} libraryArea - The ID of the library are
+ * @returns {Promise<Array[]>} - The available days
+ */
+module.exports.getAvailableDays = async (userId, guildId, libraryArea) => {
+    return new Promise(async (resolve, reject) => {
+        
+        if(!userId || !guildId) {
+            reject("NO_USER")
+            return
+        }
+
+        const browser = await puppeteer.launch({headless: true})
+
+        const page = await browser.newPage()
+
+        await page.goto('https://www.biblioteche.unisa.it/chiedi-al-bibliotecario?richiesta=3');
+
+        const cookies = await getDatabaseCookies(userId, guildId)
+
+        if(!cookies) {
+            return reject("NO_CREDENTIALS")
+        }
+
+        try {
+            await validateLogin(page, cookies, userId, guildId)
+            
+            await page.click('.card-button')
+
+            await delay(1000)
+            //Selezione tipo di prenotazione
+            await page.click('#select2-servizio-container')
+
+            await page.keyboard.press('Enter')
+        
+            //Selezione area biblioteca
+            await page.click('#select2-area-container')
+
+            await delay(1000)
+
+            const libraryAreaId = await page.evaluate((libraryArea) => {
+                return Array.from(document.querySelectorAll('span[class="select2-results"] > ul > li')).find((element) => element.textContent.includes(libraryArea)).id
+            }, libraryArea)
+
+            await page.click(`#${libraryAreaId}`)
+
+            await delay(100)
+
+            await page.click('input[id="data_inizio"]')
+            
+            await delay(100)
+            
+            const dates = await page.evaluate(() => {
+                const data  = []
+                data.push({ testo: document.querySelector('table[class="table-condensed"] > tbody > tr > td[class="active day"]').textContent, date: document.querySelector('table[class="table-condensed"] > tbody > tr > td[class="active day"]').getAttribute('data-date') })
+                const elements = document.querySelectorAll('table[class="table-condensed"] > tbody > tr > td[class="day"]')
+   
+                elements.forEach((element) => {
+                    data.push({testo: element.textContent, date: element.getAttribute('data-date')})
+                })
+        
+                return data
+            })
+
+            const selectedDate = dates[0].date
+            
+
+            await page.click(`table[class="table-condensed"] > tbody > tr > td[data-date="${selectedDate}"]`)
+
+            await delay(1000)
+
+            await page.click('#verify')
+
+            await delay(1000)
+
+            const timeTable = await page.evaluate((dates) => {
+                const data  = {}
+                document.querySelectorAll('div[class="interval-outer-div"]').forEach((element, index) => {
+                    const rowsArray = element.querySelector('div').querySelectorAll('div[class="flex-row interval-div"]')
+
+                    data[`${dates[index].date}`] = []
+
+                    rowsArray.forEach((element) => {
+                        element.querySelector('div[class="flex-form interval-values"]').querySelectorAll('div').forEach(subElement => {
+                            if(subElement.querySelector('p').getAttribute('class') == 'slot_unavailable') {
+                            data[`${dates[index].date}`].push({ avaible: false, time: subElement.querySelector('p').textContent, id: null }) 
+                        } else {
+                            data[`${dates[index].date}`].push({ avaible: true, time: subElement.querySelector('p').textContent.replaceAll('\n','').replaceAll('\t',''), id : subElement.querySelector('p').getAttribute('onclick') || null })
+                        }
+                        })
+                    })
+                })
+
+                return data
+            }, dates)
+
+            resolve(timeTable)
+
+            await browser.close()
+        } catch(e) {
+            reject(e)
+        }
+    })
+}
+
+/**
+ * @param {String} userId 
+ * @param {String} guildId 
+ * @returns {Promise<Array>} - The array of available areas
+ */
+module.exports.getLibraryAreas = async (userId, guildId) => {
+    return new Promise(async (resolve, reject) => {
+
+        if(!userId || !guildId) {
+            reject("NO_USER")
+            return
+        }
+
+        const browser = await puppeteer.launch({headless: true})
+
+        const page = await browser.newPage()
+        await page.setViewport({width: 1920, height: 1080})
+
+        await page.goto('https://www.biblioteche.unisa.it/chiedi-al-bibliotecario?richiesta=3');
+
+        const cookies = await getDatabaseCookies(userId, guildId)
+
+        if(!cookies) {
+            return reject("NO_CREDENTIALS")
+        }
+
+        try {
+            await validateLogin(page, cookies, userId, guildId)
+            
+            await page.click('.card-button')
+
+            await delay(1000)
+            //Selezione tipo di prenotazione
+            await page.click('#select2-servizio-container')
+
+            await page.keyboard.press('Enter')
+        
+            //Selezione area biblioteca
+            await page.click('#select2-area-container')
+
+            const areaArray = await page.evaluate(() => {
+                const data = []
+                const elements = document.querySelectorAll('span[class="select2-results"] > ul > li')
+                elements.forEach((element) => {
+                    if(!element.textContent.includes('Biblioteca')) return
+                data.push({testo : element.textContent.replaceAll('\n','').replaceAll('\t','') })
+                })
+                return data
+            })
+
+            resolve(areaArray)
+
+            await browser.close()
+        } catch(e) {
+            reject(e)
+        }
+    })
 }
 
 //Functions
@@ -145,7 +283,7 @@ async function setDatabaseCookies(userId, guildId, cookies) {
     })
 }
 
-async function validateLogin(page, cookies) {
+async function validateLogin(page, cookies, userId, guildId) {
     return new Promise(async (resolve, reject) => {
         try {
             for (let cookie of cookies) {
@@ -159,7 +297,19 @@ async function validateLogin(page, cookies) {
             if(titolo == 'Spazio di Ateneo') {
                 resolve()
             } else {
-                reject("EXPIRED")
+                await userSchema.findOneAndUpdate({
+                    userId: userId,
+                    guildId: guildId
+                },{
+                    userId: userId,
+                    guildId: guildId,
+                    spidCredentialsCookies: null
+                }, {
+                    upsert: true,
+                    new: true
+                })
+
+                reject("CREDENTIALS_EXPIRED")
             }
         } catch(e) {
             reject(e)
