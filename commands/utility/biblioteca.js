@@ -31,7 +31,7 @@ module.exports = {
                 loginSpid(interaction)
             break
             case 'aree':
-                areee(interaction)
+                aree(interaction)
             break
             case 'orari':
                 orari(interaction)
@@ -42,43 +42,21 @@ module.exports = {
      * @param {import('discord.js').Interaction} interaction
      */
     async selectMenu(interaction) {
-        const guildId = interaction.guildId
-        const userId = interaction.user.id
-        const areaId = interaction.values[0]
-
-        interaction.deferReply()
-
-        try {
-            const dates = await unisaLibraryAPI.getAvailableDays(userId, guildId, areaId)
-
-            const datesEmbed = new EmbedBuilder()
-                .setTitle('📚 Orari disponibili 📚')
-                .setDescription('Ecco gli orari disponibili per la prenotazione')
-                .setColor('Aqua')
-                .setTimestamp()
-            
-                let index = 0
-
-                for(const date in dates) {
-                const dateObj = new Date(Number(date))
-
-                const dateString = dateObj.toLocaleTimeString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-
-                dates[date].forEach((time) => {
-                    if(index == 25) return
-                    datesEmbed.addFields({ name: dateString, value: time.time })
-                    index++
-                })
-            }
-
-            await interaction.editReply({ embeds: [datesEmbed], components: [] })
-        } catch(e) {
-            console.log(e)
-        }
+        const menuArray = interaction.customId.split('%')
+        const menuId = menuArray[1]
         
+        switch(menuId) {
+            case 'areas':
+                selectMenuAree(interaction)
+            break
+            case 'days':
+                selectMenuGiorni(interaction)
+            break
+        }
     }
 }
 
+//Funzioni sottocomandi
 /**
  * @param {import('discord.js').Interaction} interaction 
  */
@@ -100,7 +78,7 @@ async function loginSpid(interaction) {
     }
 }
 
-async function areee(interaction) {
+async function aree(interaction) {
     await interaction.deferReply({ ephemeral: false })
 
     const guildId = interaction.guildId
@@ -147,7 +125,7 @@ async function orari(interaction) {
 
         //Menu a tendina
         const areaMenu = new SelectMenuBuilder()
-        .setCustomId('areas')
+        .setCustomId('biblioteca%areas')
         .setPlaceholder('Seleziona un\'area')
         .addOptions(options)
 
@@ -163,4 +141,89 @@ async function orari(interaction) {
             await interaction.editReply({content: inlineCode('Si è verificato un errore generico!') })
         }
     }
+}
+
+//Funzioni menù selezione
+/**
+ * @param {import('discord.js').Interaction} interaction
+ */
+async function selectMenuAree(interaction) {
+    //Questa funzione viene eseguita nel momento in cui viene seleionata un'area dal menù a tendina con id 'areas'
+
+    interaction.deferReply({ ephemeral: true })
+
+    const guildId = interaction.guildId
+    const userId = interaction.user.id
+    const areaId = interaction.values[0]
+
+    try {
+        const dates = await unisaLibraryAPI.getAvailableDays(userId, guildId, areaId)
+
+        const options = []
+        dates.forEach((date) => {
+            const dateObj = new Date(Number(date.date))
+
+            const dateString = dateObj.toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+
+            options.push({label: dateString, value: `${date.date}%${areaId}` })
+        })
+
+        //Menu a tendina
+        const daysMenu = new SelectMenuBuilder()
+        .setCustomId('biblioteca%days')
+        .setPlaceholder('Seleziona un giorno')
+        .addOptions(options)
+
+        await interaction.editReply({ components: [new ActionRowBuilder().addComponents(daysMenu)] })
+    } catch(e) {
+        if(e === 'CREDENTIALS_EXPIRED') {
+            await interaction.editReply({content: inlineCode('⚠️| Il tuo QR Code è scaduto! Usa il comando per eseguire l\accesso'), epehemeral: false })
+        } else if(e === 'NO_CREDENTIALS') {
+            await interaction.editReply({content: inlineCode('⚠️| Non hai ancora eseguito l\'accesso! Usa il comando per eseguire l\accesso'), epehemeral: false })
+        } else {
+            console.log(e)
+            await interaction.editReply({content: inlineCode('Si è verificato un errore generico!'), epehemeral: false })
+        }
+    }
+}
+
+async function selectMenuGiorni(interaction) {
+    //Questa funzione viene eseguita nel momento in cui viene selezionato un giorno dal menù a tendina con id 'days'
+    await interaction.deferReply()
+
+    const menuValue = interaction.values[0].split('%')
+    const userId = interaction.user.id
+    const guildId = interaction.guildId
+    const date = menuValue[0]
+    const areaId = menuValue[1]
+    
+    try {
+        const hours = await unisaLibraryAPI.getAvailableHours(userId, guildId, areaId, date)
+
+        const dateObj = new Date(Number(hours[0].date))
+        const dateString = dateObj.toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+
+        const hoursEmbed = new EmbedBuilder()
+            .setTitle('🕒 Orari disponibili 🕒')
+            .setColor('Aqua')
+            .setDescription(`Orari disponibili per ${dateString}`)
+            .addFields({name: 'Area', value: areaId })
+            hours.forEach((hour) => {
+                
+
+                hoursEmbed.addFields({name: hour.time, value: hour.avaible ? '🟢 Disponibile' : '🔴 Non disponibile' })
+            })
+
+        await interaction.editReply({ embeds: [hoursEmbed] })
+    } catch(e) {
+        if(e === 'CREDENTIALS_EXPIRED') {
+            await interaction.editReply({content: inlineCode('⚠️| Il tuo QR Code è scaduto! Usa il comando per eseguire l\accesso'), epehemeral: false })
+        } else if(e === 'NO_CREDENTIALS') {
+            await interaction.editReply({content: inlineCode('⚠️| Non hai ancora eseguito l\'accesso! Usa il comando per eseguire l\accesso'), epehemeral: false })
+        } else {
+            console.log(e)
+            await interaction.editReply({content: inlineCode('Si è verificato un errore generico!'), epehemeral: false })
+        }
+    }
+
 }

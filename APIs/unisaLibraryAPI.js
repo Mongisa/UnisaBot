@@ -43,8 +43,10 @@ module.exports.checkSpidLogin = async (userId, guildId, interaction) => {
                 try {
                     const result = await validateLogin(page, cookies, userId, guildId)
                     resolve(result)
+                    await browser.close()
                 } catch(e) {
                     reject(e)
+                    await browser.close()
                 }
             } catch(e) {
                 reject(e)
@@ -69,7 +71,7 @@ module.exports.checkSpidLogin = async (userId, guildId, interaction) => {
  * @param {String} userId - The user's ID
  * @param {String} guildId  - The guild's ID
  * @param {String} libraryArea - The ID of the library are
- * @returns {Promise<Array[]>} - The available days
+ * @returns {Promise<Array>} - The available days
  */
 module.exports.getAvailableDays = async (userId, guildId, libraryArea) => {
     return new Promise(async (resolve, reject) => {
@@ -131,43 +133,13 @@ module.exports.getAvailableDays = async (userId, guildId, libraryArea) => {
                 return data
             })
 
-            const selectedDate = dates[0].date
-            
-
-            await page.click(`table[class="table-condensed"] > tbody > tr > td[data-date="${selectedDate}"]`)
-
-            await delay(1000)
-
-            await page.click('#verify')
-
-            await delay(1000)
-
-            const timeTable = await page.evaluate((dates) => {
-                const data  = {}
-                document.querySelectorAll('div[class="interval-outer-div"]').forEach((element, index) => {
-                    const rowsArray = element.querySelector('div').querySelectorAll('div[class="flex-row interval-div"]')
-
-                    data[`${dates[index].date}`] = []
-
-                    rowsArray.forEach((element) => {
-                        element.querySelector('div[class="flex-form interval-values"]').querySelectorAll('div').forEach(subElement => {
-                            if(subElement.querySelector('p').getAttribute('class') == 'slot_unavailable') {
-                            data[`${dates[index].date}`].push({ avaible: false, time: subElement.querySelector('p').textContent, id: null }) 
-                        } else {
-                            data[`${dates[index].date}`].push({ avaible: true, time: subElement.querySelector('p').textContent.replaceAll('\n','').replaceAll('\t',''), id : subElement.querySelector('p').getAttribute('onclick') || null })
-                        }
-                        })
-                    })
-                })
-
-                return data
-            }, dates)
-
-            resolve(timeTable)
+            resolve(dates)
 
             await browser.close()
         } catch(e) {
             reject(e)
+
+            await browser.close()
         }
     })
 }
@@ -227,6 +199,102 @@ module.exports.getLibraryAreas = async (userId, guildId) => {
             await browser.close()
         } catch(e) {
             reject(e)
+
+            await browser.close()
+        }
+    })
+}
+
+/**
+ * @param {String} userId 
+ * @param {String} guildId 
+ * @param {String} libraryArea 
+ * @param {String} date 
+ * @returns {Promise<Array>} - The array of available hours
+ */
+module.exports.getAvailableHours = async (userId, guildId, libraryArea, selectedDate) => {
+    return new Promise(async (resolve, reject) => {
+        
+        if(!userId || !guildId) {
+            reject("NO_USER")
+            return
+        }
+
+        if(!libraryArea || !selectedDate) {
+            reject("NO_AREA")
+            return
+        }
+
+        const browser = await puppeteer.launch({headless: true})
+
+        const page = await browser.newPage()
+
+        await page.goto('https://www.biblioteche.unisa.it/chiedi-al-bibliotecario?richiesta=3');
+
+        const cookies = await getDatabaseCookies(userId, guildId)
+
+        if(!cookies) {
+            return reject("NO_CREDENTIALS")
+        }
+
+        try {
+            await validateLogin(page, cookies, userId, guildId)
+            
+            await page.click('.card-button')
+
+            await delay(1000)
+            //Selezione tipo di prenotazione
+            await page.click('#select2-servizio-container')
+
+            await page.keyboard.press('Enter')
+        
+            //Selezione area biblioteca
+            await page.click('#select2-area-container')
+
+            await delay(1000)
+
+            const libraryAreaId = await page.evaluate((libraryArea) => {
+                return Array.from(document.querySelectorAll('span[class="select2-results"] > ul > li')).find((element) => element.textContent.includes(libraryArea)).id
+            }, libraryArea)
+
+            await page.click(`#${libraryAreaId}`)
+
+            await delay(100)
+
+            await page.click('input[id="data_inizio"]')
+            
+            await delay(100)            
+
+            await page.click(`table[class="table-condensed"] > tbody > tr > td[data-date="${selectedDate}"]`)
+
+            await delay(1000)
+
+            await page.click('#verify')
+
+            await delay(1000)
+
+            const timeTable = await page.evaluate((selectedDate) => {
+                const data  = []
+                document.querySelectorAll('div[class="interval-outer-div"]')[0].querySelector('div').querySelectorAll('div[class="flex-row interval-div"]').forEach((element) => {
+                        element.querySelector('div[class="flex-form interval-values"]').querySelectorAll('div').forEach(subElement => {
+                            if(subElement.querySelector('p').getAttribute('class') == 'slot_unavailable') {
+                            data.push({ avaible: false, time: subElement.querySelector('p').textContent, id: null, date: selectedDate }) 
+                        } else {
+                            data.push({ avaible: true, time: subElement.querySelector('p').textContent.replaceAll('\n','').replaceAll('\t',''), id : subElement.querySelector('p').getAttribute('onclick') || null, date: selectedDate })
+                        }
+                        })
+                })
+
+                return data
+            }, selectedDate)
+
+            resolve(timeTable)
+
+            await browser.close()
+        } catch(e) {
+            reject(e)
+
+            await browser.close()
         }
     })
 }

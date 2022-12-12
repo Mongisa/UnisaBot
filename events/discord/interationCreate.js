@@ -45,7 +45,14 @@ client.on('interactionCreate', async (interaction) => {
             command.autocomplete(interaction)
         }
     } else if (interaction.isSelectMenu()) {
-        const commandName = interaction.message.interaction.commandName.split(' ')[0]
+        var commandName = interaction.message.interaction?.commandName.split(' ')[0]
+
+        if(!commandName) {
+            commandName = interaction.customId.split('%')[0]
+        }
+
+        if(!commandName) throw new Error('There is no command name!')
+
         const command = client.commands.get(commandName)
 
         if(!command) return
