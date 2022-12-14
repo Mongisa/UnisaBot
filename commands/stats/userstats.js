@@ -52,7 +52,7 @@ module.exports = {
             .setFields(
                 { name: '🗓️ Data Creazione Account', value: createdAt },
                 { name: '🗓️ Data Unione Server', value: joinedAt },
-                { name: '🔢 Messaggi Totali Inviati', value: result.totalMessagesSent.toString() },
+                { name: '🔢 Messaggi Totali Inviati', value: result.totalMessagesSent?.toString() || '0' },
                 { name: `Interazioni con ${interaction.client.user.username}`, value: result.totalInteractions?.toString() || '0' },
             )
 

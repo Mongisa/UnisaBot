@@ -6,7 +6,7 @@ module.exports = async () => {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         keepAlive: true,
-        maxPoolSize: 10
+        maxPoolSize: 10,
     })
     return mongoose
 
