@@ -1,48 +1,34 @@
-const { SlashCommandBuilder, inlineCode, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder, inlineCode } = require('discord.js')
 const userStats = require('../../schemas/user-schema')
 const slapsSchema = require('../../schemas/slaps-schema')
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('userstats')
-        .setDescription('📊 Mostra le statistiche di un utente nel server')
-        .addUserOption(option => 
-            option
-                .setName('user')
-                .setDescription('Utente di cui mostrare le statistiche')
-                .setRequired(true)
-        ),
-
+        .setName('mystats')
+        .setDescription('📊 Mostra le tue statistiche nel server'),
     /**
-     * @param {import('discord.js').Interaction} interaction
-     */
+    * @param {import('discord.js').Interaction} interaction 
+    */
     async execute(interaction) {
-        const targetUser = interaction.guild.members.cache.get(interaction.options.getUser('user').id)
+        const userId = interaction.user.id
         const guildId = interaction.guildId
-
-        const targetUserId = targetUser.user.id
-        const targetUserUsername = targetUser.user.username
-
-        if(targetUser.bot) {
-            await interaction.reply({ content: inlineCode('⚠️| Non posso mostrare le statistiche di un bot!'), ephimeral: true })
-            return
-        }
-
+        const username = interaction.user.username
+        
         const result = await userStats.findOne({
             guildId,
-            userId: targetUserId
+            userId
         })
 
         if(!result) {
-            interaction.reply({ content: inlineCode('⚠️| Ancora non posseggo informazioni su questo utente!'), ephimeral: true })
+            interaction.reply({ content: inlineCode('⚠️| Ancora non posseggo tue informazioni!'), ephimeral: true })
             return
         }
 
         const slapsData = await slapsSchema.findOne({
-            userId: targetUserId
+            userId
         })
 
-        const joinedAt = new Date(targetUser.joinedTimestamp).toLocaleDateString('it-IT', {
+        const joinedAt = new Date(interaction.member.joinedTimestamp).toLocaleDateString('it-IT', {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
@@ -50,7 +36,7 @@ module.exports = {
             minute: 'numeric',
         })
 
-        const createdAt = new Date(targetUser.user.createdAt).toLocaleDateString('it-IT', {
+        const createdAt = new Date(interaction.user.createdAt).toLocaleDateString('it-IT', {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
@@ -59,8 +45,8 @@ module.exports = {
         })
 
         const userStatsEmbed = new EmbedBuilder()
-            .setTitle(`📊 Statistiche ${targetUserUsername} | ${interaction.guild.name} 📊`)
-            .setThumbnail(targetUser.user.avatarURL())
+            .setTitle(`📊 Statistiche ${username} | ${interaction.guild.name} 📊`)
+            .setThumbnail(interaction.user.avatarURL())
             .setColor('Gold')
 
             .setFields(
