@@ -2,8 +2,12 @@ const client = require('../../index')
 const { ChannelType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 const guildsSettingsSchema = require('../../schemas/guildsSettings-schema')
 
+const levelingSystem = require('../../levelingSystem')
+
 client.on('voiceStateUpdate', async (oldState, newState) => {
     if(newState.member.user.bot) return
+
+    levelingSystem.startListener(oldState, newState)
 
     const guildId = newState.guild.id
     const userId = newState.member.user.id
