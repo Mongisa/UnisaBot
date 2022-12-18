@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, inlineCode, EmbedBuilder } = require('discord.js')
+const ms = require('ms')
 const userStats = require('../../schemas/user-schema')
 const slapsSchema = require('../../schemas/slaps-schema')
+const levelingSystem = require('../../levelingSystem')
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -75,6 +77,12 @@ module.exports = {
 
         if(slapsData.data[guildId]) {
             userStatsEmbed.addFields({ name: '✋ Schiaffi Ricevuti', value: slapsData.data[guildId].toString() })
+        }
+
+        const levelingData = await levelingSystem.getUserData(guildId, targetUserId)
+
+        if(levelingData) {
+            userStatsEmbed.addFields({ name: '🕒 Tempo in chat vocale', value: ms(levelingData.Time, { long: true }).toString() })
         }
 
         interaction.reply({ embeds: [userStatsEmbed] })
