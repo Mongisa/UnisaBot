@@ -1,6 +1,7 @@
 const client = require('../../index')
-const canvafy = require('canvafy')
 const guildsSettingsSchema = require('../../schemas/guildsSettings-schema')
+const { AttachmentBuilder } = require('discord.js')
+const Canvas = require('discord-canvas')
 
 client.on('guildMemberAdd', async member => {
     
@@ -20,22 +21,20 @@ client.on('guildMemberAdd', async member => {
 
         if(!welcomeChannel) return new Error('Welcome channel not found on Discord')
     
-        const welcomeCanvas = await new canvafy.WelcomeLeave()
-            .setAvatar(member.user.displayAvatarURL({ forceStatic: true, extension: 'png' }))
-            .setTitle(`Benvenuto/a ${member.user.username}`, '#000000')
-            .setDescription(`Benvenuto in ${member.guild.name}!`, '#FA26A0')
-            .setBorder("#000000")
-            .setAvatarBorder("#000000")
+        const welcomeCanvas = await new Canvas.Welcome()
+            .setUsername(member.user.username)
+            .setAvatar(member.user.avatarURL({ forceStatic: true, extension: 'jpg' }))
+            .setBackground('https://img.freepik.com/free-vector/sparkling-golden-stars-confetti-burst-background_1017-32368.jpg')
+            .setGuildName(member.guild.name)
+            .setMemberCount(member.guild.memberCount)
+            .setDiscriminator(member.user.discriminator)
+            .setText('Title', 'BENVENUTO!')
+            .setText('Message', 'Benvenuto nel server {server}')
+            .toAttachment()
 
-            if(member.displayHexColor && member.displayHexColor !== '#000000') {
-                welcomeCanvas.setColor('color', member.displayHexColor)
-            } else {
-                welcomeCanvas.setBackground('color', '#2FF3E0')
-            }
+        const attachment = new AttachmentBuilder(welcomeCanvas.toBuffer(), { name: `welcome-${member.id}.png` })
 
-            welcomeCanvas.build()
-
-        welcomeChannel.send({ content:`<@${member.id}>`, files: [{ attachment: welcomeCanvas.toBuffer(), name: `welcome-${member.id}.png` }] })
+        welcomeChannel.send({ content:`<@${member.id}>`, files: [attachment] })
     }
 
     //Assegna il ruolo di default

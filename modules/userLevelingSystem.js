@@ -178,7 +178,7 @@ class LevelingClient {
       })
       if(!data) return resolve(null)
 
-      const position = (await this.sortUsers(guildId)).findIndex(x => { x.User == userId})
+      const position = (await this.sortUsers(guildId)).findIndex(user => user.User == userId) + 1
 
       const { User, Time, Username, Guild } = data
       resolve({ User, Time, Username, Guild, position })
