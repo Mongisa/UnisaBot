@@ -28,9 +28,6 @@ module.exports = {
         var currEx = process.env.MIN_1LVL * 60 * 1000 //Esperienza della persona di partenza (15 minuti)
 
         const result = await calcoloLvl(lvl, currEx, userData.Time)
-
-        console.log(result.livello, result.requiredXp, result.tempoCorrente)
-
         
         const rankCanvas = await new Canvas.RankCard()
         .setAddon('xp', true)

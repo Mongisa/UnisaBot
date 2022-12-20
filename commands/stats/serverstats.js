@@ -15,11 +15,20 @@ module.exports = {
             guildId
         })
 
+        const createdDate = new Date(interaction.guild.createdTimestamp).toLocaleDateString('it-IT',{
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+        })
+
         const guilsStatsEmbed = new EmbedBuilder()
             .setTitle(`📊 Informazioni Server 📊`)
             .setColor('#C539B4')
             .setFields(
                 { name: 'Nome del server', value: interaction.guild.name, inline: true },
+                { name: '🗓️ Data Creazione', value: createdDate, inline: true },
                 { name: '👥 Membri totali', value: interaction.guild.memberCount.toString(), inline: true },
                 { name: '🤖 Bot totali', value: interaction.guild.members.cache.filter(member => member.user.bot).size.toString(), inline: true },
                 { name: '🟢 Membri online', value: interaction.guild.members.cache.filter(member => member.presence?.status === 'online' && !member.user.bot).size.toString(), inline: true },
