@@ -25,7 +25,7 @@ module.exports = {
         }
 
         var lvl = 1 //Livello della persona di partenza
-        var currEx = 15 * 60 * 1000 //Esperienza della persona di partenza (15 minuti)
+        var currEx = process.env.MIN_1LVL * 60 * 1000 //Esperienza della persona di partenza (15 minuti)
 
         const result = await calcoloLvl(lvl, currEx, userData.Time)
 
