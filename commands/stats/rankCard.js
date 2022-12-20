@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js')
+const { SlashCommandBuilder, AttachmentBuilder, inlineCode } = require('discord.js')
 const levelingSystem = require('../../levelingSystem')
 const Canvas = require('discord-canvas')
 const ms = require('ms')
