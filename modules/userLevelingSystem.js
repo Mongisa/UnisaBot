@@ -19,6 +19,7 @@ class LevelingClient {
       new mongoose.Schema({
         User: String,
         Username: String,
+        StartDate: Number,
         Time: Number,
         Guild: String
       })
@@ -67,7 +68,7 @@ class LevelingClient {
       if(!await this.schemas.timer.findOne({ User: userId, Guild: guildId })) {
 
         if(this.debugMode) {
-          console.log(`${newState.member.user.tag} sta farmando XP`)
+          console.log(`${newState.member.user.tag} sta farmando XP [${this.client.guilds.cache.get(guildId).name}]`)
         }
 
         new this.schemas.timer({
@@ -89,7 +90,7 @@ class LevelingClient {
         if(!await this.schemas.timer.findOne({ User: inChatUserId, Guild: guildId })) {
 
           if(this.debugMode) {
-            console.log(`${user.user.tag} sta farmando XP`)
+            console.log(`${user.user.tag} sta farmando XP [${this.client.guilds.cache.get(guildId).name}]`)
           }
 
           new this.schemas.timer({
@@ -107,7 +108,7 @@ class LevelingClient {
     if(await this.schemas.timer.findOne({ User: userId, Guild: guildId })) {
       if (this.debugMode) {
         console.log(
-          `${newState.member.user.tag} ha smesso di farmare XP`
+          `${newState.member.user.tag} ha smesso di farmare XP [${this.client.guilds.cache.get(guildId).name}]`
         );
       }
 
@@ -128,14 +129,18 @@ class LevelingClient {
               timerData.delete()
               if(this.debugMode) {
                 console.log(
-                  ms(Time, { long: true }) + ` for ${newState.member.user.tag}`
+                  ms(Time, { long: true }) + ` for ${newState.member.user.tag} [${this.client.guilds.cache.get(guildId).name}]`
                 )
               }
 
               if(!userData) {
+                if(this.debugMode) {
+                  console.log(`Inserted ${newState.member.user.tag} on MongoDB [${this.client.guilds.cache.get(guildId).name}]`)
+                }
                 new this.schemas.user({
                   User: userId,
                   Username: newState.member.user.username,
+                  StartDate: Date.now(),
                   Time,
                   Guild: guildId
                 }).save()
