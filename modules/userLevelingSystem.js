@@ -194,27 +194,56 @@ class LevelingClient {
   * @description Generate a leaderboard
   * @param {String} guildId discord.js's guild aka `message.guild`
   * @param {Number} top How many users you want to show
-  * @returns {Promise<Array>} Array of objects
+  * @returns {Promise<EmbedBuilder>} Leaderboard Embed
   */
-  async generateLeaderboard(guildId, top = 10) {
+  async generateLeaderboard(guildId, userId, top = 10) {
     return new Promise(async (resolve, reject) => {
       try {
 
         const data = await this.sortUsers(guildId)
 
         if(data.length == 0) return reject("No users")
+
+        var isPresent = false
         
-        const topTen = data.slice(0, top)
+        const topTen = data.slice(0, top).map((x, index) => {
+          var string = ''
+
+          if(index == 0) {
+            string = `🥇${bold(`#`)} <@${x.User}> - ${inlineCode(msToTime(x.Time))}`
+          } else if(index == 1) {
+            string = `🥈${bold(`#`)} <@${x.User}> - ${inlineCode(msToTime(x.Time))}`
+          } else if(index == 2) {
+            string = `🥉${bold(`#`)} <@${x.User}> - ${inlineCode(msToTime(x.Time))}`
+          } else {
+            string = `${bold(`${index + 1}#`)} <@${x.User}> - ${inlineCode(msToTime(x.Time))}`
+          }
+          
+          if(x.User == userId) {
+            isPresent = true
+            string += ` ${bold("👑")}`
+          }
+
+          return string
+        })
+
+        if(!isPresent) {
+          const userData = await this.getUserData(guildId, userId)
+          if(userData) {
+            topTen.push(`[...]`)
+            topTen.push(`${bold(`${userData.position}#`)} <@${userData.User}> - ${inlineCode(msToTime(userData.Time))} ${bold("👑")}`)
+          }
+        }
 
         if(this.debugMode) {
-          console.log(topTen)
+          console.log('Creating leaderboard...')
         }
+
+        const embedDescription = topTen.join("\n")
 
         const leaderboardEmbed = new EmbedBuilder()
           .setDescription(
-            topTen.map((x, index) => {
-              return `${bold(`${index + 1}#`)} ${x.Username} - ${inlineCode(ms(ms(x.Time), { long: true }))}`
-            })  
+            embedDescription
           )
         
         resolve(leaderboardEmbed)
@@ -224,7 +253,66 @@ class LevelingClient {
       }
     })
   }
+
+  /**
+   * @param {String} guildId - Id server
+   * @param {String} userId - Id utente
+   * @returns {Promise<Object>}
+   */
+  async calculateUserLvl(guildId, userId) {
+
+    var currEx = process.env.MIN_1LVL * 60 * 1000 //Esperienza della persona di partenza
+    var lvl = 0;
+
+    return new Promise(async (resolve, reject) => {
+
+      const userData = await this.schemas.user.findOne({
+        User: userId,
+        Guild: guildId
+      })
+
+      if(!userData) return resolve(null)
+
+      var userTime = userData.Time
+
+      function calcola(lvl,currEx,userTime) {
+        if(userTime - currEx > 0) {
+          userTime = userTime - currEx
+          lvl++;
+        
+          currEx = currEx + (15/100)*currEx; //Ogni livello è +15% del prec
+        
+          calcola(lvl, currEx, userTime)
+        } else {
+          const result = {
+            "livello": lvl,
+            "tempoCorrente": userTime,
+            "requiredXp": currEx 
+          }
+          resolve(result)
+        }
+      }
+        
+      calcola(lvl, currEx, userTime)
+    })
+  }
   
+}
+
+/**
+ * 
+ * @param {Number} ms 
+ * @returns {String}
+ */
+function msToTime(ms) {
+  const days = Math.floor(ms / (24*60*60*1000));
+  const daysms = ms % (24*60*60*1000);
+  const hours = Math.floor(daysms / (60*60*1000));
+  const hoursms = ms % (60*60*1000);
+  const minutes = Math.floor(hoursms / (60*1000));
+  const minutesms = ms % (60*1000);
+  const sec = Math.floor(minutesms / 1000);
+  return days + "g" + hours + "h" + minutes + "m" + sec + "s";
 }
 
 module.exports = LevelingClient

@@ -1,12 +1,12 @@
 const { SlashCommandBuilder, AttachmentBuilder, inlineCode } = require('discord.js')
 const levelingSystem = require('../../levelingSystem')
 const Canvas = require('discord-canvas')
-const ms = require('ms')
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('rankcard')
         .setDescription('📊 Mostra la tua rankcard nel server')
+        .setDMPermission(false)
         .addUserOption(option => option.setName('user').setDescription('Utente da mostrare')),
     /**
      * @param {import('discord.js').Interaction} interaction
@@ -18,24 +18,20 @@ module.exports = {
         const username = user.username
 
         const userData = await levelingSystem.getUserData(guildId, userId)
+        const xpData = await levelingSystem.calculateUserLvl(guildId, userId)
 
-        if(!userData) {
+        if(!userData || !xpData) {
             await interaction.reply({ content: inlineCode('⚠️| Ancora non posseggo informazioni su questo utente!'), ephimeral: true })
             return
         }
-
-        var lvl = 1 //Livello della persona di partenza
-        var currEx = process.env.MIN_1LVL * 60 * 1000 //Esperienza della persona di partenza (15 minuti)
-
-        const result = await calcoloLvl(lvl, currEx, userData.Time)
         
         const rankCanvas = await new Canvas.RankCard()
         .setAddon('xp', true)
         .setAddon('reputation', false)
         .setAddon('badges', false)
-        .setLevel(result.livello)
-        .setXP('current', Math.round(result.tempoCorrente/1000))
-        .setXP('needed', Math.round(result.requiredXp/1000))
+        .setLevel(xpData.livello)
+        .setXP('current', Math.round(xpData.tempoCorrente/1000))
+        .setXP('needed', Math.round(xpData.requiredXp/1000))
         .setRank(userData.position.toString())
         .setAvatar(user.avatarURL({ forceStatic: true, extension: 'jpg' }))
         .setUsername(username)
@@ -46,30 +42,4 @@ module.exports = {
 
         interaction.reply({ files: [attachment] })
     }
-}
-
-//Funzioni
-
-function calcoloLvl(lvl, currEx, userTime) {
-    return new Promise((resolve, reject) => {
-        function calcola(lvl,currEx,userTime) {
-            if(userTime - currEx > 0) {
-                userTime = userTime - currEx
-                lvl++;
-        
-                currEx = currEx + (2/10)*currEx;
-        
-                calcola(lvl, currEx, userTime)
-            } else {
-                const result = {
-                    "livello": lvl,
-                    "tempoCorrente": userTime,
-                    "requiredXp": currEx 
-                }
-                resolve(result)
-            }
-        }
-        
-        calcola(lvl, currEx, userTime)
-    })
 }
