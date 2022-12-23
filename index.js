@@ -51,6 +51,10 @@ async function registerCommands () {
                 const command = require(`./${baseFolder}${dir}/${obj}`)
 
                 if(command.data) {
+                    if(command.ignored && command.ignored == true) {
+                        console.log(`❌ [ ${dir.slice(1)} | ${obj} ] command ignored`)
+                        return
+                    }
                     commands.push(command.data.toJSON())
                     client.commands.set(command.data.name, command)
                 } else if(command.type == 2) {

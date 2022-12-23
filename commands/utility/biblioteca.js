@@ -1,7 +1,8 @@
 const { SlashCommandBuilder, inlineCode, EmbedBuilder, SelectMenuBuilder, SelectMenuOptionBuilder, ActionRowBuilder } = require('discord.js')
 const unisaLibraryAPI = require('../../APIs/unisaLibraryAPI')
-
+//COMANDO DISABILITATO
 module.exports = {
+    ignored: true,
     data: new SlashCommandBuilder()
         .setName('biblioteca')
         .setDescription('Gestire prenotazioni biblioteca UNISA')
