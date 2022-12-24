@@ -68,7 +68,13 @@ class LevelingClient {
       if(!await this.schemas.timer.findOne({ User: userId, Guild: guildId })) {
 
         if(this.debugMode) {
-          console.log(`${newState.member.user.tag} sta farmando XP [${this.client.guilds.cache.get(guildId).name}]`)
+          console.log(`${newState.member.user.tag} sta farmando XP [${this.client.guilds.cache.get(guildId).name}] [${new Date().toLocaleDateString('it-IT', {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+        })}]`)
         }
 
         new this.schemas.timer({
@@ -90,7 +96,13 @@ class LevelingClient {
         if(!await this.schemas.timer.findOne({ User: inChatUserId, Guild: guildId })) {
 
           if(this.debugMode) {
-            console.log(`${user.user.tag} sta farmando XP [${this.client.guilds.cache.get(guildId).name}]`)
+            console.log(`${user.user.tag} sta farmando XP [${this.client.guilds.cache.get(guildId).name}] [${new Date().toLocaleDateString('it-IT', {
+              day: 'numeric',
+              month: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+          })}]`)
           }
 
           new this.schemas.timer({
@@ -108,7 +120,13 @@ class LevelingClient {
     if(await this.schemas.timer.findOne({ User: userId, Guild: guildId })) {
       if (this.debugMode) {
         console.log(
-          `${newState.member.user.tag} ha smesso di farmare XP [${this.client.guilds.cache.get(guildId).name}]`
+          `${newState.member.user.tag} ha smesso di farmare XP [${this.client.guilds.cache.get(guildId).name}] [${new Date().toLocaleDateString('it-IT', {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+        })}]`
         );
       }
 
