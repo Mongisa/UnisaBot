@@ -32,8 +32,12 @@ module.exports = {
             .setFooter({ text: 'Powered by Discord.js', iconURL: 'https://www.clipartmax.com/png/middle/89-894960_js-discord-bot-logo-node-js-and-react-js.png' })
 
             .setFields(
-                { name: 'Tempo Totale Online', value: `${Math.round(uptime/(60*24))}g${Math.round(uptime%1440/60)}h${Math.round(uptime % 1440 %60)}m` },
-                { name: 'Interazioni Totali', value: totalInteractions.toString() }
+                { name: '⏱️ Tempo Totale Online', value: `${Math.round(uptime/(60*24))}g${Math.round(uptime%1440/60)}h${Math.round(uptime % 1440 %60)}m` },
+                { name: '🔗 Interazioni Totali', value: totalInteractions.toString() },
+                { name: '🖧 Server', value: interaction.client.guilds.cache.size.toString() },
+                { name: '👤 Utenti', value: interaction.client.users.cache.size.toString() },
+                { name: '📟 Versione', value: '1.0.0' },
+                { name: '💻 Sviluppatore del Bot', value: 'Mongisa#0590' },
             )
 
         await interaction.reply({ embeds: [botStatsEmbed] })

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js')
+const { SlashCommandBuilder, inlineCode } = require('discord.js')
 const levelingSystem = require('../../levelingSystem')
 
 module.exports = {
@@ -13,15 +13,21 @@ module.exports = {
         const userId = interaction.user.id
         const guildId = interaction.guildId
 
-        const leaderboardEmbed = await levelingSystem.generateLeaderboard(guildId, userId)
+        try {
+            const leaderboardEmbed = await levelingSystem.generateLeaderboard(guildId, userId)
 
-        leaderboardEmbed
+            leaderboardEmbed
             .setTitle(`📊 Classifica dei punti [${interaction.guild.name}] 📊`)
             .setColor('Random')
             .setThumbnail(interaction.guild.iconURL({ dynamic: false }))
             .setTimestamp()
             .setFooter({ text: 'Powered by Discord.js', iconURL: 'https://www.clipartmax.com/png/middle/89-894960_js-discord-bot-logo-node-js-and-react-js.png' })
     
-        interaction.reply({ embeds: [leaderboardEmbed] })
+            interaction.reply({ embeds: [leaderboardEmbed] })
+        } catch (err) {
+            if(err == 'No users') {
+                await interaction.reply({ content: inlineCode('⚠️| Statistiche vocali non disponibili!'), ephemeral: true })
+            }
+        }
     }
 }
