@@ -45,14 +45,21 @@ module.exports = {
             new: true
         })
 
-        const dm = await interaction.guild.members.cache.get(targetUserId).createDM()
+        try {
+            const dm = await interaction.guild.members.cache.get(targetUserId).createDM()
 
-        if(interaction.user.id == targetUserId) {
-            dm.send('Ti sei schiaffeggiato da solo, complimentoni!')
-        } else {
-            dm.send(`Sei stato schiaffeggiato da ${bold(interaction.user.username)}`)
+            if(interaction.user.id == targetUserId) {
+                await dm.send('Ti sei schiaffeggiato da solo, complimentoni!')
+            } else {
+                await dm.send(`Sei stato schiaffeggiato da ${bold(interaction.user.username)}`)
+            }
+    
+            interaction.reply({ content: inlineCode(`✅| ${bold(targetUsername)} è stato schiaffeggiato`), ephemeral: true })
+
+        } catch (err) {
+            interaction.reply({ content: inlineCode(`⚠️| ${bold(targetUsername)} ha i DM disabilitati! (Il contatore è stato comunque aggiornato)`), ephemeral: true })
+            return
         }
 
-        interaction.reply({ content: inlineCode(`✅| ${bold(targetUsername)} è stato schiaffeggiato`), ephemeral: true })
     }
 }
