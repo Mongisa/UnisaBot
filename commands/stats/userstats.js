@@ -84,12 +84,16 @@ module.exports = {
         if(levelingData) {
             userStatsEmbed.addFields({ name: '🕒 Tempo in chat vocale', value: ms(levelingData.Time, { long: true }).toString() })
 
+            userStatsEmbed.addFields({ name: '🗓️ Data inizio conteggio', value: new Date(levelingData.StartDate).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' }) })
+            
             //Calcolo percentuale tempo rispetto al #1
             const usersArray = await levelingSystem.sortUsers(guildId)
             const topUserTime = usersArray[0].Time
             const perc = Math.round(levelingData.Time / topUserTime * 100)
 
-            userStatsEmbed.addFields({ name: `% tempo rispetto al #1 ${usersArray[0].Username}`, value: `${perc}%` })
+            if(perc < 100) {
+                userStatsEmbed.addFields({ name: `% tempo rispetto al #1 ${usersArray[0].Username}`, value: `${perc}%` })
+            }
         }
 
         interaction.reply({ embeds: [userStatsEmbed] })
