@@ -61,7 +61,7 @@ class LevelingClient {
     const userId = newState.member.id
     const guildId = newState.guild.id
     const guild = this.client.guilds.cache.get(guildId)
-    const channelPresencesArray = Array.from(guild.voiceStates.cache.filter(state => { return state.channelId == newState?.channelId && state.member.user.bot == false && state.member.user.id != userId && state.selfDeaf == false }).keys())
+    const channelPresencesArray = Array.from(guild.voiceStates.cache.filter(state => { return state.channelId == (newState.channelId ? newState.channelId : oldState.channelId) && state.member.user.bot == false && state.member.user.id != userId && state.selfDeaf == false }).keys())
 
     if(newState.channel && newState.channel.id != newState.guild.afkChannelId && newState.selfDeaf == false && channelPresencesArray.length > 0) {
 
