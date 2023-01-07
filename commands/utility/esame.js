@@ -2,6 +2,7 @@ const { SlashCommandBuilder, inlineCode, EmbedBuilder } = require('discord.js')
 const googleAPI = require('../../APIs/googleAPI')
 
 module.exports = {
+    ignored: true,
     data: new SlashCommandBuilder()
         .setName('esame')
         .setDescription('📝 Mostra le date degli esami')
