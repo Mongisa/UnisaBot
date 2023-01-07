@@ -131,7 +131,7 @@ class LevelingClient {
       }
 
       // If the user is the last one in the channel, delete the timer
-      if(channelPresencesArray.length == 1) {
+      if(channelPresencesArray.length == 0) {
         this.startListener(oldState, guild.voiceStates.cache.get(channelPresencesArray[0]))
       }
 
